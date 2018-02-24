@@ -6,4 +6,5 @@ res/
 ## Others
 .DS_Store
 *.swp
+*.*~
 

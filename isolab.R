@@ -1,8 +1,19 @@
 ## wl-20-02-2018, Tue: commence
+## wl-24-02-2018, Sat: Not install. Directly use package source code
+## ======================================================================
+## Notes:
+##  1) How to produce the demo data 'xcms_obj.rda' ?
+## 
+## ======================================================================
+library(xcms)
+library(ecipex)
+library(gsubfn)
+source("all_IsotopicLabelling.R")
+## library(IsotopicLabelling)
+## library(stringr)
 
-library(IsotopicLabelling)
 ## ------------------------------------------------------------------------
-data("xcms_obj")
+load("./test-data/xcms_obj.rda") ## data("xcms_obj")
 peak_table <- table_xcms(xcms_obj)
 peak_table[57:59,]
 
@@ -52,19 +63,21 @@ grouped_estimates <-
   group_labelling(fitted_abundances,
                   groups=factor(c(rep("C12",4), rep("C13",4))))
 grouped_estimates 
-## wl-20-02-2018, Tue: what is his for?
+## wl-20-02-2018, Tue: what is this for?
 
 ## ------------------------------------------------------------------------
 ## Get the example data frame containing target abalytes
-data("targets")
+load("./test-data/targets.rda") ## data("targets")
 targets
 
 ## Batch-process the data
-## wl-20-02-2018, Tue: problem.
+## wl-20-02-2018, Tue: problem?
 batch_grouped_estimates <- 
   batch_labelling(targets=targets,
                   groups=factor(c(rep("C12",4), rep("C13",4))),
                   plot_patterns=FALSE, plot_residuals=FALSE,
                   plot_results=FALSE, save_results=FALSE)
+
+batch_grouped_estimates
 
 

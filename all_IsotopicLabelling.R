@@ -1,3 +1,18 @@
+## ======================================================================
+## wl-24-02-2018, Sat: commence for modify, debug and test
+## ======================================================================
+## To-Do:
+##   1) Can we not install this package and simply source the source code?
+##   2) How many R packages used in this package? 
+##   3) Need to find out calling functions in other packages
+##   4) Need to find out the original input in tabular format
+##   5) 
+## ======================================================================
+## Notes:
+##  1) use other R packages: xcms, ecipex, stringr, gsubfn
+## 
+## ======================================================================
+
 #' =======================================================================
 #' Batch process a set of target analytes
 #'
