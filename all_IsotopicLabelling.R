@@ -62,11 +62,9 @@
 #'
 #' @seealso \link{main_labelling}, \link{group_labelling},
 #' \link{save_labelling}, \link{plot.labelling}
-
 #' -------------------------------------------------------------------- 
 #' wl-20-02-2018, Tue: This function has problems: peak_table, attach. 
-#' Need to debug and test.
-
+#' Need to debug and test. (28-02-2018, Wed: No problem)
 batch_labelling <- function(targets, groups, plot_patterns=T,
                             plot_residuals=F, plot_results=F, 
                             save_results=F){
@@ -554,56 +552,6 @@ isotopic_pattern <-function(peak_table, info, mass_shift, RT, RT_shift, chrom_wi
 }
 
 #' ========================================================================
-#' IsotopicLabelling-package
-#'
-#' The \code{IsotopicLabelling} package allows to analyse the isotopic
-#' patterns in MS data obtained in isotopic labelling experiments. From the
-#' experimental patterns, the package estimates the isotopic abundance of
-#' the stable isotope employed in the labelling experiment (either ^2H or
-#' ^13C) inside a specified compound.
-#'
-#'
-#' @section Details: Given a data frame of LC-MS or GC-MS peak intensities
-#'   or areas (one column for each sample to analyse), the
-#'   \code{\link{IsotopicLabelling}} package first extracts the isotopic
-#'   patterns of the specified compound, and then performs an isotopic
-#'   pattern analysis to estimate the isotopic abundance of the labelling
-#'   isotope. This is performed through a weighted non-linear least squares
-#'   fitting procedure, where the resulting estimate is the value for which
-#'   the theoretical pattern best reproduces the experimental one. During
-#'   the fitting, the experimental signals are given weights proportional to
-#'   the square root of their intensity, to correct for the non uniform
-#'   variance at different intensity levels. The theoretical patterns are
-#'   computed using the \code{\link[ecipex]{ecipex}} R package.
-#'
-#' @section Block diagram:
-#' The isotopic pattern analysis can be divided into the following steps:
-#' \enumerate{
-#' \item Starting from a class \code{xcmsSet} object (from the \code{xcms} R
-#' package), generate a data frame of peak signal intensities or areas, with
-#' each column corresponding to a sample.  This step can be avoided if the
-#' data frame is already available (obtained by other means);
-#' \item Extract from the data frame the experimental isotopic patterns of
-#' the specified compound (one pattern for each sample).  In the chemical
-#' formula of the compound, the element whose abundance is unknown is called
-#' "X";
-#' \item Normalise the patterns and estimate the abundance of the label
-#' through a weighted non-linear least squares fitting procedure.
-#' \item Summarize the results.
-#' }
-#'
-#' @docType package
-#' @name IsotopicLabelling
-#'
-#' @import xcms
-#' @import ecipex
-#' @import stringr
-#' @import gsubfn
-#'
-#' @author Ruggero Ferrazza, Pietro Franceschi
-NULL
-
-#' ========================================================================
 #' Main function of the package
 #'
 #' It computes the estimated X abundances of each sample, returning an
@@ -930,12 +878,10 @@ save_labelling <-function(fitted_abundances, path=getwd()){
 #'
 summary.labelling <- function(object, ...){
 
-  fitted_abundances <- object
-
-  best_est <- fitted_abundances$best_estimate
-  std_error <- fitted_abundances$std_error
-
-  results <- rbind(best_est, std_error);
+  fitted_abundances  <- object
+  best_est           <- fitted_abundances$best_estimate
+  std_error          <- fitted_abundances$std_error
+  results            <- rbind(best_est, std_error)
   row.names(results) <- c("Best Estimate [%]", "Standard Error [%]")
 
   return(results)
@@ -1006,3 +952,53 @@ table_xcms <- function(xcms_obj){
 #' @examples
 #' data("xcms_obj")
 ## "xcms_obj"
+
+#' ========================================================================
+#' IsotopicLabelling-package
+#'
+#' The \code{IsotopicLabelling} package allows to analyse the isotopic
+#' patterns in MS data obtained in isotopic labelling experiments. From the
+#' experimental patterns, the package estimates the isotopic abundance of
+#' the stable isotope employed in the labelling experiment (either ^2H or
+#' ^13C) inside a specified compound.
+#'
+#'
+#' @section Details: Given a data frame of LC-MS or GC-MS peak intensities
+#'   or areas (one column for each sample to analyse), the
+#'   \code{\link{IsotopicLabelling}} package first extracts the isotopic
+#'   patterns of the specified compound, and then performs an isotopic
+#'   pattern analysis to estimate the isotopic abundance of the labelling
+#'   isotope. This is performed through a weighted non-linear least squares
+#'   fitting procedure, where the resulting estimate is the value for which
+#'   the theoretical pattern best reproduces the experimental one. During
+#'   the fitting, the experimental signals are given weights proportional to
+#'   the square root of their intensity, to correct for the non uniform
+#'   variance at different intensity levels. The theoretical patterns are
+#'   computed using the \code{\link[ecipex]{ecipex}} R package.
+#'
+#' @section Block diagram:
+#' The isotopic pattern analysis can be divided into the following steps:
+#' \enumerate{
+#' \item Starting from a class \code{xcmsSet} object (from the \code{xcms} R
+#' package), generate a data frame of peak signal intensities or areas, with
+#' each column corresponding to a sample.  This step can be avoided if the
+#' data frame is already available (obtained by other means);
+#' \item Extract from the data frame the experimental isotopic patterns of
+#' the specified compound (one pattern for each sample).  In the chemical
+#' formula of the compound, the element whose abundance is unknown is called
+#' "X";
+#' \item Normalise the patterns and estimate the abundance of the label
+#' through a weighted non-linear least squares fitting procedure.
+#' \item Summarize the results.
+#' }
+#'
+#' @docType package
+#' @name IsotopicLabelling
+#'
+#' @import xcms
+#' @import ecipex
+#' @import stringr
+#' @import gsubfn
+#'
+#' @author Ruggero Ferrazza, Pietro Franceschi
+NULL
