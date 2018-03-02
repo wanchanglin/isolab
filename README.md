@@ -1,5 +1,5 @@
 # isolab
-Galaxy tool for Isotopic Labelling
+Galaxy tool for Isotopic Labelling. Right now only two R files. One is the source code of original package and another one is from the vignette. an XML will be written for Galaxy in the near future.
 
 ## To-do ##
 
