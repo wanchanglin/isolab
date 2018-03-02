@@ -39,24 +39,27 @@ attributes(fitted_abundances)
 ## [1] "labelling"
 
 ## ------------------------------------------------------------------------
+## wl-20-02-2018, Tue: or use wrapper function
+fitted_abundances <- main_labelling(peak_table, compound="X40H77NO8P", 
+                                    charge=1, labelling="C", mass_shift=0.05, 
+                                    RT=285, RT_shift=20, chrom_width=7, 
+                                    initial_abundance=NA)
+
+## ------------------------------------------------------------------------
 ## Quickly look at the results
 summary(object=fitted_abundances)
+
 ## Plot the patterns
 plot(x=fitted_abundances, type="patterns", saveplots=F)
 ## Plot the residuals
 plot(x=fitted_abundances, type="residuals", saveplots=F)
 ## Plot the overall results
 plot(x=fitted_abundances, type="summary", saveplots=F)
+
 ## Save the results to a *.csv file
 save_labelling(fitted_abundances)
 
-## ------------------------------------------------------------------------
-## wl-20-02-2018, Tue: wrapper function
-fitted_abundances <- main_labelling(peak_table, compound="X40H77NO8P", 
-                                    charge=1, labelling="C", mass_shift=0.05, 
-                                    RT=285, RT_shift=20, chrom_width=7, 
-                                    initial_abundance=NA)
-
+## =======================================================================
 ## ------------------------------------------------------------------------
 ## Group the samples and obtain grouped estimates
 grouped_estimates <- 
