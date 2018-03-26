@@ -1,17 +1,8 @@
 ## ======================================================================
-## wl-24-02-2018, Sat: commence for modify, debug and test
-## ======================================================================
-## To-Do:
-##   1) Can we not install this package and simply source the source code?
-##   2) How many R packages used in this package? 
-##   3) Need to find out calling functions in other packages
-##   4) Need to find out the original input in tabular format
-##   5) 
+## wl-24-02-2018, Sat: commence for debug and test
 ## ======================================================================
 ## Notes:
 ##  1) use other R packages: xcms, ecipex, stringr, gsubfn
-## 
-## ======================================================================
 
 
 #' ========================================================================
@@ -184,7 +175,7 @@ isotopic_information <- function(compound, charge=1, labelling){
 
 
   ## In isotopes data frame keep only the elements of interest
-  DF <- strapply(compound,
+  DF <- strapply(compound,      ## wl-26-03-18: from package 'gsubfn'
                  "([A-Z][a-z]*)(\\d*)",
                  ~ c(..1, if (nchar(..2)) ..2 else 1),
                  simplify = ~ as.data.frame(t(matrix(..1, 2)), stringsAsFactors = FALSE))
@@ -272,11 +263,11 @@ isotopic_information <- function(compound, charge=1, labelling){
 #' @author Ruggero Ferrazza
 #' @seealso \code{\link{table_xcms}} , \code{\link{isotopic_information}}
 #' @keywords manip
-isotopic_pattern <-function(peak_table, info, mass_shift, RT, RT_shift, chrom_width){
+isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift, 
+                             chrom_width){
 
   tmp_list <- lapply(info$target, function(x){
     ind <- which( (abs(peak_table$mz - x) < mass_shift) & (peak_table$rt < (RT + RT_shift) ) & (peak_table$rt > (RT - RT_shift) ) )
-    
     return(data.frame(ind=ind, rt=peak_table[ind,"rt"]))
   })
 
@@ -301,11 +292,8 @@ isotopic_pattern <-function(peak_table, info, mass_shift, RT, RT_shift, chrom_wi
 
     if (length(ind)>=1){
       ind <- ind[which.min(abs(peak_table$rt[ind] - rt_best))]
-
       patterns[i,] <- as.numeric(peak_table[ind,])
-
     }
-
   }
 
   ## Check that the most intense signals do not come from M-2 or M-1 (which
@@ -314,7 +302,6 @@ isotopic_pattern <-function(peak_table, info, mass_shift, RT, RT_shift, chrom_wi
 
   if (ncol(patterns)>=3){
     max_pos <- apply(patterns[,-c(1,2)], 2, which.max)
-
     patterns[,c(F,F,max_pos <=2)]  <- 0
   }
 
@@ -385,8 +372,8 @@ isotopic_pattern <-function(peak_table, info, mass_shift, RT, RT_shift, chrom_wi
 #' @author Ruggero Ferrazza
 #' @seealso \code{\link{isotopic_information}}
 find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
-  tmp_results <- list()
 
+  tmp_results <- list()
 
   analysis_X <- function(pattern, info, initial_ab=NA, charge=1){
 
@@ -448,11 +435,9 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
 
 
   for (i in 3:ncol(patterns)){
-
     tmp_results[[i-2]] <- analysis_X(pattern=patterns[,i], info=info,
                                      initial_ab=initial_abundance[i-2]/100,
                                      charge=charge)
-
   }
   names(tmp_results) <- colnames(patterns[,-c(1,2)])
 
@@ -587,8 +572,8 @@ pattern_from_abundance <-function(abundance, info, charge=1){
 #' @seealso \link{main_labelling}, \link{group_labelling},
 #' \link{save_labelling}, \link{plot.labelling}
 #' -------------------------------------------------------------------- 
-#' wl-20-02-2018, Tue: This function has problems: peak_table, attach. 
-#' Need to debug and test. (28-02-2018, Wed: No problem)
+#' wl-20-02-2018, Tue: This function has problem: peak_table. 
+#' Need to be an argument.
 batch_labelling <- function(targets, groups, plot_patterns=T,
                             plot_residuals=F, plot_results=F, 
                             save_results=F){
@@ -600,9 +585,12 @@ batch_labelling <- function(targets, groups, plot_patterns=T,
   batch_grouped_estimates <- list()
 
   for (i in 1:length(compound)){
-    batch_fitted <- main_labelling(peak_table, compound=compound[i],
-                                   charge=charge[i], labelling=labelling[i],
-                                   mass_shift=mass_shift[i], RT=RT[i],
+    batch_fitted <- main_labelling(peak_table, 
+                                   compound=compound[i],
+                                   charge=charge[i], 
+                                   labelling=labelling[i],
+                                   mass_shift=mass_shift[i], 
+                                   RT=RT[i],
                                    RT_shift=RT_shift[i],
                                    chrom_width=chrom_width[i],
                                    initial_abundance=as.numeric(targets[i,8:ncol(targets)]))
@@ -669,16 +657,16 @@ group_labelling <- function(fitted_abundances, groups){
 
   ## Extract the estimated percentage abundances and the std errors of the
   ## fit
-  estimates <- fitted_abundances$best_estimate
+  estimates   <- fitted_abundances$best_estimate
   std_err_fit <- fitted_abundances$std_error
 
   ## Remove NA's from the data
   ind_NA <- which(is.na(estimates) | is.na(std_err_fit))
 
   if (length(ind_NA) !=0) {
-    estimates <- estimates[-ind_NA]
+    estimates   <- estimates[-ind_NA]
     std_err_fit <- std_err_fit[-ind_NA]
-    groups <- groups[-ind_NA]
+    groups      <- groups[-ind_NA]
   }
 
   ## Compute the average for each group
@@ -695,14 +683,12 @@ group_labelling <- function(fitted_abundances, groups){
   var_TOT <- var_biol + var_within
 
   ## Compute the std error of the MEAN
-  N <- tapply(groups,groups,length)
+  N        <- tapply(groups,groups,length)
   std_MEAN <- sqrt( var_TOT / N )
 
   ## Compute the 95% Confidence intervals
   width <- tapply(groups, groups, function(x){ qt(.975, df=length(x)-1) })
-
   Lower <- avg - width*std_MEAN
-
   Upper <- avg + width*std_MEAN
 
   ## Provide the output
@@ -711,7 +697,6 @@ group_labelling <- function(fitted_abundances, groups){
                                 CI", "Upper 95% CI")
 
   return(grouped_estimates)
-
 }
 
 
