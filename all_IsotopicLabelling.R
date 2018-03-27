@@ -267,13 +267,14 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
                              chrom_width){
 
   tmp_list <- lapply(info$target, function(x){
-    ind <- which( (abs(peak_table$mz - x) < mass_shift) & (peak_table$rt < (RT + RT_shift) ) & (peak_table$rt > (RT - RT_shift) ) )
+    ind <- which( (abs(peak_table$mz - x) < mass_shift) & 
+                    (peak_table$rt < (RT + RT_shift) ) & 
+                    (peak_table$rt > (RT - RT_shift) ) )
     return(data.frame(ind=ind, rt=peak_table[ind,"rt"]))
   })
 
   ## Extract the retention times of all the peaks
   rt_overall <- sort(unique(unlist(lapply(tmp_list, function(x){x$rt}), use.names=F)))
-
   rt_grouped <- apply(abs(outer(rt_overall,rt_overall,'-')), 2, function(u) list(rt_overall[u<=chrom_width]))
   rt_grouped <- unique(lapply(rt_grouped, "[[", 1))
 
@@ -288,7 +289,8 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
 
   for (i in 1:length(info$target)){
 
-    ind <- which( (abs(peak_table$mz - info$target[i]) < mass_shift) & (abs(peak_table$rt - rt_best)<= chrom_width) )
+    ind <- which( (abs(peak_table$mz - info$target[i]) < mass_shift) & 
+                    (abs(peak_table$rt - rt_best)<= chrom_width) )
 
     if (length(ind)>=1){
       ind <- ind[which.min(abs(peak_table$rt[ind] - rt_best))]
@@ -311,7 +313,7 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
   patterns <- patterns[-c(1,2),]
 
   ## Check that each pattern has at least two signals different from 0, otherwise set all to 0
-  ind_pat <- apply(patterns[,-c(1,2)], 2, function(c)sum(c!=0)) > 1
+  ind_pat <- apply(patterns[,-c(1,2)], 2, function(c) sum(c!=0)) > 1
   patterns[,c(F,F,!ind_pat)] <- 0
 
   ## Add the exact masses to the patterns matrix
@@ -374,19 +376,23 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
 find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
 
   tmp_results <- list()
-
+  
+  ## ========================================================================
   analysis_X <- function(pattern, info, initial_ab=NA, charge=1){
 
     ## Create a vector of masses
     target <- info$target[-c(1,2)]
 
     ## Create the list to return in case of errors
-    error_list <- list(compound=info$compound, best_estimate=NA,
-                       std_error=NA, dev_percent=NA, x_scale=target,
-                       y_exp=pattern/max(pattern)*100,
-                       y_theor=rep(NA, times=length(pattern)),
-                       residuals=rep(NA, times=length(pattern)),
-                       warnings="An error occurred")
+    error_list <- list(compound      = info$compound,
+                       best_estimate = NA,
+                       std_error     = NA,
+                       dev_percent   = NA,
+                       x_scale       = target,
+                       y_exp         = pattern/max(pattern)*100,
+                       y_theor       = rep(NA, times = length(pattern)),
+                       residuals     = rep(NA, times = length(pattern)),
+                       warnings      = "An error occurred")
 
     if (sum(pattern)==0) return(error_list)
 
@@ -405,20 +411,23 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
     if (initial_ab >1) initial_ab <- 1
 
     ## Fitting procedure to find the best estimate for the X isotopic
-    ## abundance The signals of the pattern are given weights proportional
+    ## abundance. The signals of the pattern are given weights proportional
     ## to the square root of their intensity, so as to give less importance
-    ## to noise Define a function of only one parameter, the abundance,
+    ## to noise. Define a function of only one parameter, the abundance,
     ## which will have to be fitted by the nls function
 
     pattern_fit <- function(abundance) {
       pattern_from_abundance(abundance, info=info, charge=charge)
     }
 
-    fit <- nls(formula=pattern~pattern_fit(abundance),
-               start=list(abundance=initial_ab),
-               control=list(maxiter=50, tol=5e-8, warnOnly=T),
-               algorithm="port", weights=sqrt(pattern),
-               na.action=na.exclude, lower=0, upper=1)
+    fit <- nls(formula   = pattern ~ pattern_fit(abundance),
+               start     = list(abundance = initial_ab),
+               control   = list(maxiter = 50, tol = 5e-8, warnOnly = T),
+               algorithm = "port",
+               weights   = sqrt(pattern),
+               na.action = na.exclude,
+               lower     = 0,
+               upper     = 1)
 
     if (inherits(try(summary(fit), silent=TRUE),"try-error")) return(error_list)
 
@@ -427,13 +436,16 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
     return(list(best_estimate = summary(fit)$coefficients[1]*100,
                 std_error     = summary(fit)$coefficients[2]*100,
                 dev_percent   = (sqrt(sum((summary(fit)$residuals)^2)/ sum(pattern^2))*100),
-                x_scale       = target, y_exp                                                = pattern,
+                x_scale       = target,
+                y_exp         = pattern,
                 y_theor       = pattern_fit(summary(fit)$coefficients[1]),
-                residuals     = pattern-pattern_fit(summary(fit)$coefficients[1]), warnings  = warnings))
+                residuals     = pattern - pattern_fit(summary(fit)$coefficients[1]),
+                warnings      = warnings))
 
   }
 
 
+  ## ========================================================================
   for (i in 3:ncol(patterns)){
     tmp_results[[i-2]] <- analysis_X(pattern=patterns[,i], info=info,
                                      initial_ab=initial_abundance[i-2]/100,

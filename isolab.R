@@ -14,30 +14,30 @@ load("./test-data/xcms_obj.rda") ## data("xcms_obj")
 peak_table <- table_xcms(xcms_obj)
 
 info <- isotopic_information(compound="X40H77NO8P", labelling="C")
-names(info)               ## "compound" "isotopes" "target" "nX" "nTOT"    
+names(info)  ## "compound" "isotopes" "target" "nX" "nTOT"    
 info$isotopes
 
-experimental_patterns <- isotopic_pattern(peak_table, info, mass_shift=0.05,
-                                          RT=285, RT_shift=20, chrom_width=7)
-dim(experimental_patterns)        ## 43 10 
+patterns <- isotopic_pattern(peak_table, info, mass_shift=0.05,
+                             RT=285, RT_shift=20, chrom_width=7)
+dim(patterns)        ## 43 10 
 
-fitted_abundances <- find_abundance(patterns=experimental_patterns, info=info,
-                                    initial_abundance=NA, charge=1)
-names(fitted_abundances)
+fitted <- find_abundance(patterns=patterns, info=info,
+                         initial_abundance=NA, charge=1)
+names(fitted)
 
 ## ------------------------------------------------------------------------
 ## Quickly look at the results
-summary(object=fitted_abundances)
+summary(object=fitted)
 
 ## Plot the patterns
-plot(x=fitted_abundances, type="patterns", saveplots=F)
+plot(x=fitted, type="patterns", saveplots=F)
 ## Plot the residuals
-plot(x=fitted_abundances, type="residuals", saveplots=F)
+plot(x=fitted, type="residuals", saveplots=F)
 ## Plot the overall results
-plot(x=fitted_abundances, type="summary", saveplots=F)
+plot(x=fitted, type="summary", saveplots=F)
 
 ## Save the results to a *.csv file
-save_labelling(fitted_abundances)
+save_labelling(fitted)
 
 ## =======================================================================
 if (F) {
