@@ -767,7 +767,8 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
 
       mtext(text, cex=0.8)
 
-      points(fitted_abundances$x_scale, fitted_abundances$y_theor[,k], col=2, pch=16, cex=.5)
+      points(fitted_abundances$x_scale, fitted_abundances$y_theor[,k], 
+             col=2, pch=16, cex=.5)  ## col="red"
       points(fitted_abundances$x_scale[1], -2.5, pch=17, col="blue")
 
       legend("top", legend=c("Experimental pattern", "Theoretical pattern"), 

@@ -27,14 +27,14 @@ names(fitted)
 
 ## ------------------------------------------------------------------------
 ## Quickly look at the results
-summary(object=fitted)
+summary(fitted)
 
 ## Plot the patterns
 plot(x=fitted, type="patterns", saveplots=F)
 ## Plot the residuals
-plot(x=fitted, type="residuals", saveplots=F)
+plot(x=fitted, type="residuals", saveplots=T)
 ## Plot the overall results
-plot(x=fitted, type="summary", saveplots=F)
+plot(x=fitted, type="summary", saveplots=T)
 
 ## Save the results to a *.csv file
 save_labelling(fitted)
