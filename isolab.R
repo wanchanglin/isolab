@@ -2,24 +2,27 @@
 ## wl-24-02-2018, Sat: Not install. Directly use package source code
 ## ======================================================================
 ## Notes:
-## 
+##   1.) Input peak table directly from CSV  file.
+##   2.) 
 library(xcms)
 library(ecipex)
 library(gsubfn)        ## Only for function strapply
 setwd("C:/R_lwc/isolab")
-source("all_IsotopicLabelling.R")
+source("all_IsotopicLabelling.R"q
 
-## ------------------------------------------------------------------------
-load("./test-data/xcms_obj.rda") ## data("xcms_obj")
-peak_table <- table_xcms(xcms_obj)
+## -------------------------------------------------q----------------------
+## load("./test-data/xcms_obj.rda") ## data("xcms_obj")
+## peak_table <- table_xcms(xcms_obj)
+load("./test-data/xset.Rdata") ## data("xcms_obj")
+peak_table <- table_xcms(xset)
 
 info <- isotopic_information(compound="X40H77NO8P", labelling="C")
 names(info)  ## "compound" "isotopes" "target" "nX" "nTOT"    
 info$isotopes
 
 patterns <- isotopic_pattern(peak_table, info, mass_shift=0.05,
-                             RT=285, RT_shift=20, chrom_width=7)
-dim(patterns)        ## 43 10 
+                             RT=40, RT_shift=20, chrom_width=7) ## TR=285
+View(patterns)        ## 43 10 
 
 fitted <- find_abundance(patterns=patterns, info=info,
                          initial_abundance=NA, charge=1)
