@@ -614,6 +614,7 @@ batch_labelling <- function(targets, groups, plot_patterns=T,
     if (plot_results) plot(x=batch_fitted, type="summary", saveplots=T)
     ## save the results to a *.csv file
     if (save_results) save_labelling(batch_fitted)
+
     ## Group the samples and obtain grouped estimates
     batch_grouped_estimates[[i]] <- group_labelling(batch_fitted, groups=groups)
   }
@@ -922,6 +923,10 @@ summary.labelling <- function(object, ...){
 #'
 #' @keywords manip
 #' @export
+#' -----------------------------------------------------------------------
+#' wl-03-04-2018, Tue: should provide dot arguments for 'peakTable'.
+#' Actually this dot argument is for 'groupval'
+#' -----------------------------------------------------------------------
 table_xcms <- function(xcms_obj){
 
   ## Check that the file in input is an xcmsSet object

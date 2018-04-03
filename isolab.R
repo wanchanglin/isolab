@@ -2,27 +2,32 @@
 ## wl-24-02-2018, Sat: Not install. Directly use package source code
 ## ======================================================================
 ## Notes:
-##   1.) Input peak table directly from CSV  file.
 ##   2.) 
-library(xcms)
 library(ecipex)
 library(gsubfn)        ## Only for function strapply
 setwd("C:/R_lwc/isolab")
-source("all_IsotopicLabelling.R"q
+source("all_IsotopicLabelling.R")
 
-## -------------------------------------------------q----------------------
+## -----------------------------------------------------------------------
+## Use data set from xcms
+## -----------------------------------------------------------------------
+## library(xcms)
 ## load("./test-data/xcms_obj.rda") ## data("xcms_obj")
-## peak_table <- table_xcms(xcms_obj)
-load("./test-data/xset.Rdata") ## data("xcms_obj")
-peak_table <- table_xcms(xset)
+## peak <- table_xcms(xcms_obj)
+## write.table(peak, file="./test-data/xcms_obj.csv", sep = ",",
+##             row.names = FALSE, quote = FALSE) 
+
+## Load data set
+peak <- read.table("./test-data/xcms_obj.csv", header = T, sep = ",", 
+                   fill = T,stringsAsFactors = F)
 
 info <- isotopic_information(compound="X40H77NO8P", labelling="C")
-names(info)  ## "compound" "isotopes" "target" "nX" "nTOT"    
+names(info)  
 info$isotopes
 
-patterns <- isotopic_pattern(peak_table, info, mass_shift=0.05,
-                             RT=40, RT_shift=20, chrom_width=7) ## TR=285
-View(patterns)        ## 43 10 
+patterns <- isotopic_pattern(peak, info, mass_shift=0.05,
+                             RT=285, RT_shift=20, chrom_width=7) ## TR=285
+View(patterns)       
 
 fitted <- find_abundance(patterns=patterns, info=info,
                          initial_abundance=NA, charge=1)
@@ -46,16 +51,15 @@ save_labelling(fitted)
 if (F) {
   ## ------------------------------------------------------------------------
   ## wl-20-02-2018, Tue: or use wrapper function
-  fitted_abundances <- main_labelling(peak_table, compound="X40H77NO8P", 
-                                      charge=1, labelling="C", mass_shift=0.05, 
-                                      RT=285, RT_shift=20, chrom_width=7, 
-                                      initial_abundance=NA)
+  fitted <- main_labelling(peak, compound="X40H77NO8P", 
+                           charge=1, labelling="C", mass_shift=0.05, 
+                           RT=285, RT_shift=20, chrom_width=7, 
+                           initial_abundance=NA)
 
   ## Group the samples and obtain grouped estimates
-  grouped_estimates <- 
-    group_labelling(fitted_abundances,
-                    groups=factor(c(rep("C12",4), rep("C13",4))))
-  grouped_estimates 
+  grp_est <- 
+    group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
+  grp_est 
 
   ## ------------------------------------------------------------------------
   ## Get the example data frame containing target abalytes
