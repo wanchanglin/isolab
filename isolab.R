@@ -32,10 +32,23 @@ View(patterns)
 fitted <- find_abundance(patterns=patterns, info=info,
                          initial_abundance=NA, charge=1)
 names(fitted)
+summary(fitted)
+
+## Group the samples and obtain grouped estimates
+grp_est <- group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
+grp_est 
 
 ## ------------------------------------------------------------------------
-## Quickly look at the results
-summary(fitted)
+## Get the example data frame containing target abalytes
+load("./test-data/targets.rda") ## data("targets")
+targets
+
+## Batch-process the data
+bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
+                               groups=factor(c(rep("C12",4), rep("C13",4))),
+                               plot_patterns=F, plot_residuals=F,
+                               plot_results=F, save_results=T)
+bat_grp_est
 
 ## Plot the patterns
 plot(x=fitted, type="patterns", saveplots=F)
@@ -44,35 +57,17 @@ plot(x=fitted, type="residuals", saveplots=T)
 ## Plot the overall results
 plot(x=fitted, type="summary", saveplots=T)
 
-## Save the results to a *.csv file
-save_labelling(fitted)
 
 ## =======================================================================
 if (F) {
+  ## Save the results to a *.csv file
+  save_labelling(fitted)
+
   ## ------------------------------------------------------------------------
   ## wl-20-02-2018, Tue: or use wrapper function
   fitted <- main_labelling(peak, compound="X40H77NO8P", 
                            charge=1, labelling="C", mass_shift=0.05, 
                            RT=285, RT_shift=20, chrom_width=7, 
                            initial_abundance=NA)
-
-  ## Group the samples and obtain grouped estimates
-  grp_est <- 
-    group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
-  grp_est 
-
-  ## ------------------------------------------------------------------------
-  ## Get the example data frame containing target abalytes
-  load("./test-data/targets.rda") ## data("targets")
-  targets
-
-  ## Batch-process the data
-  batch_grouped_estimates <-  
-    batch_labelling(targets=targets,
-                    groups=factor(c(rep("C12",4), rep("C13",4))),
-                    plot_patterns=FALSE, plot_residuals=FALSE,
-                    plot_results=FALSE, save_results=FALSE)
-  batch_grouped_estimates
-
 }
 

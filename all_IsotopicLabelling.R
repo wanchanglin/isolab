@@ -584,9 +584,8 @@ pattern_from_abundance <-function(abundance, info, charge=1){
 #' @seealso \link{main_labelling}, \link{group_labelling},
 #' \link{save_labelling}, \link{plot.labelling}
 #' -------------------------------------------------------------------- 
-#' wl-20-02-2018, Tue: This function has problem: peak_table. 
-#' Need to be an argument.
-batch_labelling <- function(targets, groups, plot_patterns=T,
+#' wl-20-02-2018, Tue: add 'peak_table' as argument. 
+batch_labelling <- function(peak_table, targets, groups, plot_patterns=T,
                             plot_residuals=F, plot_results=F, 
                             save_results=F){
 
