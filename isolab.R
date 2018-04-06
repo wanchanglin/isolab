@@ -8,17 +8,8 @@ library(gsubfn)        ## Only for function strapply
 setwd("C:/R_lwc/isolab")
 source("all_IsotopicLabelling.R")
 
-## -----------------------------------------------------------------------
-## Use data set from xcms
-## -----------------------------------------------------------------------
-## library(xcms)
-## load("./test-data/xcms_obj.rda") ## data("xcms_obj")
-## peak <- table_xcms(xcms_obj)
-## write.table(peak, file="./test-data/xcms_obj.csv", sep = ",",
-##             row.names = FALSE, quote = FALSE) 
-
-## Load data set
-peak <- read.table("./test-data/xcms_obj.csv", header = T, sep = ",", 
+## Load peak table
+peak <- read.table("./test-data/xcms_obj.tsv", header = T, sep = "\t", 
                    fill = T,stringsAsFactors = F)
 
 info <- isotopic_information(compound="X40H77NO8P", labelling="C")
@@ -39,9 +30,9 @@ grp_est <- group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
 grp_est 
 
 ## ------------------------------------------------------------------------
-## Get the example data frame containing target abalytes
-load("./test-data/targets.rda") ## data("targets")
-targets
+## Load batch parameters
+targets <- read.table("./test-data/targets.tsv", header = T, sep = "\t", 
+                   fill = T,stringsAsFactors = F)
 
 ## Batch-process the data
 bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
@@ -57,7 +48,7 @@ plot(x=fitted, type="residuals", saveplots=T)
 ## Plot the overall results
 plot(x=fitted, type="summary", saveplots=T)
 
-
+## =======================================================================
 ## =======================================================================
 if (F) {
   ## Save the results to a *.csv file
@@ -70,4 +61,19 @@ if (F) {
                            RT=285, RT_shift=20, chrom_width=7, 
                            initial_abundance=NA)
 }
+
+## -----------------------------------------------------------------------
+## Use data set from xcms
+## -----------------------------------------------------------------------
+## library(xcms)
+## load("./test-data/xcms_obj.rda") ## data("xcms_obj")
+## peak <- table_xcms(xcms_obj)
+## write.table(peak, file="./test-data/xcms_obj.tsv", sep = "\t",
+##             row.names = FALSE, quote = FALSE) 
+
+## ------------------------------------------------------------------------
+## Get the example data frame containing target abalytes
+# load("./test-data/targets.rda") ## data("targets")
+# write.table(targets,file="./test-data/targets.tsv", sep="\t",
+#             row.names = FALSE, quote = FALSE) 
 
