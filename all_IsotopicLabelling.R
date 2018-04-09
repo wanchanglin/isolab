@@ -743,9 +743,10 @@ group_labelling <- function(fitted_abundances, groups){
 #'
 #' @author Ruggero Ferrazza
 #' @keywords hplot
+
 plot.labelling <- function(x, type="patterns", saveplots=F, ...){
   fitted_abundances <- x
-  plot.new()
+  ## plot.new()
   old.par <- par(no.readonly = T)
 
   sample_name <- names(fitted_abundances$best_estimate)
@@ -818,7 +819,6 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
 
   if (saveplots==T) dev.off() else par(old.par)
 }
-
 
 #' ========================================================================
 #' Export to csv
