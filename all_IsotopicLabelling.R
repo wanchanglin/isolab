@@ -705,12 +705,11 @@ group_labelling <- function(fitted_abundances, groups){
 
   ## Provide the output
   grouped_estimates <- data.frame(N, avg, std_MEAN, width, Lower, Upper);
-  names(grouped_estimates) <- c("N", "Mean", "SE mean", "t_crit", "Lower 95%
-                                CI", "Upper 95% CI")
+  names(grouped_estimates) <- c("N", "Mean", "SE mean", "t_crit", 
+                                "Lower 95% CI", "Upper 95% CI")
 
   return(grouped_estimates)
 }
-
 
 #' ========================================================================
 #' Plot method for \code{labelling} objects
@@ -746,7 +745,7 @@ group_labelling <- function(fitted_abundances, groups){
 
 plot.labelling <- function(x, type="patterns", saveplots=F, ...){
   fitted_abundances <- x
-  ## plot.new()
+  plot.new()
   old.par <- par(no.readonly = T)
 
   sample_name <- names(fitted_abundances$best_estimate)
