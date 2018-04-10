@@ -1,6 +1,7 @@
 ## Folders to be ignored (only for galaxy tool)
 ## doc/
 ## test-data/
+res/
 
 ## R History and session data files
 .RData
