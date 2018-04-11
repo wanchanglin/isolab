@@ -3,12 +3,11 @@
 ## wl-03-04-2018, Tue: Abandon `xcms` and use directly `csv` or `tsv` data
 ## formats
 ## wl-10-04-2018, Tue: substantial changes.
+## wl-11-04-2018, Wed: command line and change plot function
 ## ----------------------------------------------------------------------
 ## To-DO: 
-##  1.) test single row data frame
-##  2.) Modify plot function and make it accept location of file saved.
-##  3.) command line
-##  4.) XML file and repeat input in Galaxy
+##  1.) XML file and repeat input in Galaxy
+##  2.) test single row data frame
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -63,64 +62,40 @@ if(com_f){
 
          ## -------------------------------------------------------------------
          ## input files
-         make_option("--data_file", type="character",
-                     help="Mass spectrometry intensity data matrix"),
-         make_option("--meta_file", type="character",
-                     help="Meta data including groups information"),
+         make_option("--peak_file", type="character",
+                     help="Peak table with m/z, retention time and intensity"),
+         make_option("--targ_file", type="character",
+                     help="Parameter data metrix in which each row is one 
+                           instance of setting for ananlysis"),
 
-         ## feature selection            
-         make_option("--group",type="character",
-                     help="Group information in the metadata for statistical 
-                     analysis."),
-         make_option("--boot", type="logical", default=TRUE,
-                     help="Apply bootstraping for feature selection or not."), 
-         make_option("--boot_size", type="integer", default=100,
-                     help="Bootstrap size"),
-         make_option("--fs_method", type="character", default="fs.welch",
-                     help="Multiple feature selection methods"), 
-         make_option("--final_set_method", type="character", default="frequency",
-                     help="Final feature set selection methods. Two methods 
-                     are supported:frequency and intersection."), 
-         make_option("--freq_cutoff",type="double", default = 0.5,
-                     help="Cutoff of frequency for resampling. Value is in 
-                     the range of 0 and 1"), 
-         make_option("--top_k", type="integer", default=50,
-                     help="Top-K feature number for the final feature set 
-                     selection"),
-         make_option("--pval_tune", type="logical", default=TRUE,
-                     help="Tune the final selected features based on p-values."),
-         make_option("--pval_thre",type="double", default = 0.05,
-                     help="P-value threshold for the final tuning of selected features."), 
+         ## group abundance estimate
+         make_option("--grp", type="logical", default=TRUE,
+                     help="Apply group estimates of abundance"), 
+         make_option("--groups",type="character",
+                     help="Group information for samples"),
+                     
+         ## plot output
+         make_option("--pattern_plot", type="logical", default=TRUE,
+                     help="Plot patterns"),
+         make_option("--residual_plot", type="logical", default=TRUE,
+                     help="Plot residuals"),
+         make_option("--result_plot", type="logical", default=TRUE,
+                     help="Plot results"),
 
-         ## plot
-         ## make_option("--freq_tab", type="logical", default=TRUE,
-         ##             help="Plot frequency table for the frequency method of the final
-         ##                   feature subset selection. Only with bootstrap."),
-         ## make_option("--venn", type="logical", default=TRUE,
-         ##             help="Plot Venn diagram for intersection method of final feature
-         ##             subset selection."),
+         ## pdf files 
+         make_option("--pattern_file",type="character", default="pattern.pdf",
+                     help="Save pattern plot"),
+         make_option("--residual_file",type="character", default="residual.pdf",
+                     help="Save residual plot"),
+         make_option("--result_file",type="character", default="result.pdf",
+                     help="Save result plot"),
 
-         ## output
-         make_option("--stats", type="logical", default=TRUE,
-                     help="Save statistical summary of data set after feature selection"),
-         make_option("--box", type="logical", default=TRUE,
-                     help="Plot the boxplot of the selected features with p-values."),
-         make_option("--pca", type="logical", default=TRUE,
-                     help="Plot the PCA (unsupervised) for the selected features."),
-         make_option("--pls", type="logical", default=TRUE,
-                     help="Plot the PLS (supervised) for the selected features."),
-         make_option("--rda", type="logical", default=TRUE,
-                     help="Save all R running results."),
-         make_option("--fusion_file",type="character", default="fusion.pdf",
-                     help="Plot feature fusion by either frequency table or Venn diagram"),
-         make_option("--data_fs_file",type="character", default="data_fs.tab",
-                     help="Data set after feature selection"),
-         make_option("--stats_file",type="character", default="stats.tab",
-                     help="Statistical summary for the data set after feature selection."),
-         make_option("--box_file",type="character",default="box.pdf"),
-         make_option("--pca_file",type="character",default="pca.pdf"),
-         make_option("--pls_file",type="character",default="pls.pdf"),
-         make_option("--rda_file",type="character",default="R_running.rda")
+         ## Excel files 
+         make_option("--summary_file",type="character",default="summary.xls",
+                     help="Save summary results in Excel"),
+         make_option("--summary_grp_file",type="character",
+                     default="summary_grp.xls",
+                     help="Save group summary results")
          )
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
@@ -128,14 +103,14 @@ if(com_f){
   ## print(opt)
 
 } else {
-  tool_dir <- "C:/R_lwc/isolab/"         ## for windows
-  ## tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
+  ## tool_dir <- "C:/R_lwc/isolab/"         ## for windows
+  tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
   opt  <- list(
-               ## input
+               ## input files
                peak_file    = paste0(tool_dir,"test-data/xcms_obj.tsv"),
                targ_file    = paste0(tool_dir,"test-data/targets.tsv"),
 
-               ## feature selection parameters
+               ## group abundance estimate
                grp            = "TRUE",
                groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
 
@@ -143,10 +118,12 @@ if(com_f){
                pattern_plot  = TRUE,
                residual_plot = TRUE,
                result_plot   = TRUE,
+
                ## pdf files 
                pattern_file  = paste0(tool_dir,"res/pattern.pdf"),
                residual_file = paste0(tool_dir,"res/residual.pdf"),
                result_file   = paste0(tool_dir,"res/result.pdf"),
+
                ## Excel files 
                summary_file     = paste0(tool_dir,"res/summary.xls"),
                summary_grp_file = paste0(tool_dir,"res/summary_grp.xls")
@@ -200,15 +177,22 @@ names(res_bat) <- as.character(unlist(targets[2,]))
 
 ## Plots
 if (opt$pattern_plot) {
-  lapply(res_bat, function(x) plot(x=x, type="patterns", saveplots=T))
+  pdf(file = opt$pattern_file, onefile = T,width=15, height=10)
+  lapply(res_bat, function(x) plot.func(x=x, type="patterns"))
+  dev.off()
 }
 
+
 if (opt$residual_plot) {
-  lapply(res_bat, function(x) plot(x=x, type="residuals", saveplots=T))
+  pdf(file = opt$residual_file, onefile = T,width=15, height=10)
+  lapply(res_bat, function(x) plot.func(x=x, type="residuals"))
+  dev.off()
 }
 
 if (opt$result_plot) {
-  lapply(res_bat, function(x) plot(x=x, type="summary", saveplots=T))
+  pdf(file = opt$result_file, onefile = T,width=15, height=10)
+  lapply(res_bat, function(x) plot.func(x=x, type="summary"))
+  dev.off()
 }
 
 ## Summary of individual sample

@@ -1017,3 +1017,48 @@ table_xcms <- function(xcms_obj){
 #'
 #' @author Ruggero Ferrazza, Pietro Franceschi
 NULL
+
+plot.func <- function(x, type="patterns", ...){
+
+  sample_name <- names(x$best_estimate)
+
+  if (type=="patterns"){
+    old.par <- par(mar=c(4,4.5,4,0.1), mfrow=c(3,1))
+    for (k in 1:length(sample_name)){
+      plot(x$x_scale, x$y_exp[,k], type="h",
+           main=paste(sample_name[k], " ,   Compound: ", x$compound), 
+           xlab="Target mass", ylab="Normalised intensity", ylim=c(0,110), cex.main=1, ...)
+      text=paste("Fitted X Abundance: (", sprintf("%1.3f", x$best_estimate[k]), "+/-", sprintf("%1.3f", x$std_error[k]), ")\ %")
+      mtext(text, cex=0.8)
+      points(x$x_scale, x$y_theor[,k], 
+             col=2, pch=16, cex=.5)  ## col="red"
+      points(x$x_scale[1], -2.5, pch=17, col="blue")
+      legend("top", legend=c("Experimental pattern", "Theoretical pattern"), 
+             lty=c(1,0), pch=c(0,16), pt.cex=c(0,0.6), col=c(1,2), cex=0.7, 
+             horiz=TRUE)
+    }
+  } else if (type=="residuals") {
+    old.par <- par(mar=c(4,4.5,4,0.1), mfrow=c(3,1))
+    for (k in 1:length(sample_name)){
+      plot(x$x_scale, x$residuals[,k], 
+           type="h", main=paste("Residuals for ", sample_name[k]), 
+           xlab="Target mass", ylab="Normalised intensity", cex.main=1, ...)
+      text=paste("Fitted X Abundance: (", sprintf("%1.3f", x$best_estimate[k]), "+/-", sprintf("%1.3f", x$std_error[k]), ")\ %")
+      mtext(text, cex=0.8)
+      abline(h=0, col="gray")
+    }
+  } else if (type=="summary"){
+    old.par <- par(mar=c(6.4,4.1,4.1,2.1))
+    plot(x$best_estimate, type="p", pch=16, cex=0.6, xaxt="n", 
+         main="Summary of the Estimated Abundances", 
+         ylab="Fitted X abundance  [%]", xlab="", cex.main=1.2, ...)
+    mtext(paste("Compound: ", x$compound))
+    axis(side=1, at=1:length(sample_name), labels=sample_name, las=2, cex.axis=0.7)
+    segments(x0  = 1:length(sample_name),
+             y0  = x$best_estimate - x$std_error,
+             x1  = 1:length(sample_name),
+             y1  = x$best_estimate + x$std_error,
+             col = "gray")
+  }
+  par(old.par)
+}
