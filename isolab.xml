@@ -5,63 +5,45 @@
     wl-15-02-2018, Thu: the second version
 -->
 
-<tool id="feat_sel" name="Feature selection for metabolomics" version="0.1.0">
+<tool id="isolab" name="IsotopicLabelling" version="0.1.0">
   <description>
-    Metabolomics feature selection with or without bootstrap.
+    Mass Spectrometric Isotopic Labelling
   </description>
   
   <!-- =============================================================== -->
   <command>
     <![CDATA[
-      Rscript ${__tool_directory__}/feat_sel.R
+      Rscript ${__tool_directory__}/isolab.R
         ## input files
-        --data_file $data_file 
-        --meta_file $meta_file 
+        --peak_file $peak_file 
+        --targ_file $targ_file 
         
-        ## which meta used for category info
-        --group $group 
-
-        ## feature selection parameters
-        --fs_method $fs_method 
-        --top_k $top_k 
-
-        --boot $boot.boot_selector
-        #if $boot.boot_selector:
-            --boot_size $boot.boot_size 
-            --final_set_method $boot.final_set_method.final_set_method_selector
-            #if $boot.final_set_method.final_set_method_selector == 'frequency':
-                --freq_cutoff $boot.final_set_method.freq_cutoff 
-            #end if
+        ## Average estimate for groups
+        --grp $grp
+        #if $grp:
+          --groups $groups
         #end if
 
-        ## tune the final feature selection by p-values
-        --pval_tune $pval_tune.pval_tune_selector
-        #if $pval_tune.pval_tune_selector:
-            --pval_thre $pval_tune.pval_thre 
+        ## Plot results
+        --pattern_plot $pattern_plot
+        --residual_plot $redidual_plot
+        --result_plot $result_plot 
+
+        ## output pdf files
+        #if $pattern_plot:
+          --pattern_file $pattern_file
+        #end if
+        #if $residual_plot:
+          --residual_file $residual_file
+        #end if
+        #if $result_plot:
+          --result_file $result_file
         #end if
 
-        ## output files
-        --stats $stats
-        --box $box
-        --pca $pca
-        --pls $pls
-        --rda $rda
-        --fusion_file $fusion_file 
-        --data_fs_file $data_fs_file 
-        #if $stats:
-          --stats_file $stats_file 
-        #end if
-        #if $box:
-          --box_file $box_file 
-        #end if
-        #if $pca:
-          --pca_file $pca_file 
-        #end if
-        #if $pls:
-          --pls_file $pls_file 
-        #end if
-        #if $rda:
-           --rda_file $rda_file 
+        ## Output Excel files
+        --summary_file $summary_file 
+        #if $grp:
+           --summary_grp_file $summary_grp_file
         #end if
 
     ]]>
@@ -69,64 +51,34 @@
 
   <!-- =============================================================== -->
   <inputs>
-    <param name="data_file" type="data"  format="tabular" label="Data matrix" 
-           help="Metabolomics data matrix which has rows of replicates and 
-                 columns of features." />
+    <param name="peak_file" type="data"  format="tabular" label="Data matrix" 
+      help="Data matrix containing the integrated signals for the samples.
+      The first two columns represent the mass and the retention time of the
+      peaks; the other columns represent peak intensities for each sample."
+      />
 
-    <param name="meta_file" type="data"  format="tabular" label="Meta matrix" 
-           help="Meta information for the experiments. One of column will
-                 be used as group information for the feature selection." />
-
-    <param name="group" type="text" value=""
-           label="Specify group information"
-           help="One of columns in meta data should be selected as group 
-                 for the feature selection" />
-
-    <param name="fs_method" type="select" multiple="True" display="checkboxes" 
-           label="Multiple feature selection method" 
-           help="Select one or more feature selection method" >
-      <option value="fs.welch">Feature selection using Welch test</option>
-      <option value="fs.auc">Feature selection using area under receiver operating curve (AUC)</option>
-      <option value="fs.rf">Feature selection using Random Forests (RF) important scores</option>
-      <option value="fs.pls">Feature selection using PLS regression coefficient</option> 
-      <!-- <option value="fs.plsvip">Feature selection using PLS VIP values</option> -->
-      <option value="fs.rfe">Feature selection using Support Vector Machine Recursive Feature Elimination (SVM-RFE)</option>
-    </param>
-
-    <param name="top_k" type="integer" value="50"
-           label="Top-k features"
-           help="Select Top-K features from each of method for the final 
-                 feature subset selection" />
+    <param name="targ_file" type="data"  format="tabular" 
+      label="Targets matrix" 
+      help="A data matrix containing information on the target analytes.
+      Columns 1 to 8 are: 'name_compound' (the name of the target analytes),
+      'compound', 'charge', 'labelling', 'RT', 'RT_shift', 'chrom_width',
+      'mass_shift'.  Columns from 9 onwards contain the initial estimates
+      for the label abundances (one estimate for each sample). If not known,
+      a single column of NA values can be entered" />
 
     <!-- =============================================================== -->
-    <conditional name="boot">
-      <param label="Feature selection with bootstrapping"
-             name="boot_selector"
+    <conditional name="grp">
+      <param name="grp_selector"
              type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
-             help="Specipy whether or not apply bootstrapping resampling to
-                   feature selection." />
+             label="Average estimate within groups" 
+             help="Calculate summary statistics for the samples belonging to 
+             the same group."/>
 
       <when value="TRUE">
-        <param name="boot_size" type="integer" value="100"
-               label="Bootstrp size"
-               help="THe bootstrap size should be larger than 100." />
-
-        <conditional name="final_set_method">
-          <param name="final_set_method_selector" type="select" 
-                 label="Choose a method for the final feature selection subset." >  
-            <option value="frequency" selected="True">frequency</option>
-            <option value="intersection">intersection</option>
-          </param>
-
-          <when value="frequency">
-            <param name="freq_cutoff" type="float" value="0.5"
-                   min="0" max="1"
-                   label="Frequency cutoff for the final subset." /> 
-          </when>
-          <when value="intersection">
-          </when>
-        </conditional>
-
+        <param name="groups" type="text" value=""
+               label="Specify group information"
+               help="A vector containing the name of the group of each sample
+               analysed." />
       </when>
 
       <when value="FALSE">
@@ -135,79 +87,48 @@
     </conditional>
 
     <!-- =============================================================== -->
-    <conditional name="pval_tune">
-      <param name="pval_tune_selector"
-             type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
-             label="Final tune feature selection by p-values" 
-             help="Filter the final feature set by the threshold of p-values."/>
-
-      <when value="TRUE">
-        <param name="pval_thre" type="float" value="0.05" 
-               label="Specify p-value threshold" 
-               help="This value should be less than 0.005. "/>
-      </when>
-
-      <when value="FALSE">
-      </when>
-
-    </conditional>
-
-    <!-- =============================================================== -->
-    <param name="stats"
-           type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
-           label="Save statistical summary of data set after feature selection"
-           help="Summary including mean, p-values, etc."/>
-    <param name="box" type="boolean" truevalue="True" falsevalue="False" 
+    <param name="pattern_plot" type="boolean" truevalue="True" falsevalue="False" 
            checked="true"
-           label="Plot boxplots of data set after feature selection" 
-           help="Output boxplots of data set after feature selection" />
-    <param name="pca" type="boolean" truevalue="True" falsevalue="False" 
+           label="Plot patterns" 
+           help="Plot the normalized experimental pattern superimposed to 
+           its fitted theoretical pattern." />
+    <param name="residual_plot" type="boolean" truevalue="True" falsevalue="False" 
            checked="true"
-           label="Plot PCA data set after feature selection" 
-           help="Output PCA plot of data set after feature selection" />
-    <param name="pls" type="boolean" truevalue="True" falsevalue="False" 
+           label="Plot residuals" 
+           help="Plot the residuals (the differences between experimental 
+           and best fitted theoretical patterns)" />
+    <param name="result_plot" type="boolean" truevalue="True" falsevalue="False" 
            checked="true"
-           label="Plot PLS data set after feature selection" 
-           help="Output PLS plot of data set after feature selection" />
-    <param name="rda" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true"
-           label="Output R results" 
-           help="R results including stats summary and data set after feature 
-           selection" />
+           label="Plot results" 
+           help="Plot a summary showing the estimated percentage abundances
+           with related standard errors." />
 
   </inputs>
 
 
   <!-- =============================================================== -->
   <outputs>
-    <data format="pdf" name="fusion_file" 
-          label="Feature fusion on ${on_string}"/>
-    <data format="tabular" name="data_fs_file" 
-          label="Data metrix afer feature selection on ${on_string}"/>
-
-    <data format="tabular" name="stats_file" 
-          label="Statistical summary on ${on_string}" >
-      <filter> stats == True </filter>
+    <data format="pdf" name="pattern_file"
+          label="Pattern plot on ${on_string}">
+      <filter> pattern_plot == True </filter>
     </data>
 
-    <data format="pdf" name="box_file"
-          label="Boxplot after feature selection on ${on_string}">
-      <filter> box == True </filter>
+    <data format="pdf" name="residual_file"
+          label="Residual plot on ${on_string}">
+      <filter> residual_plot == True </filter>
     </data>
 
-    <data format="pdf" name="pca_file"
-          label="PCA plot after feature selection on ${on_string}">
-      <filter> pca == True </filter>
+    <data format="pdf" name="result_file"
+          label="Result summary plot on ${on_string}">
+      <filter> result_plot == True </filter>
     </data>
 
-    <data format="pdf" name="pls_file"
-          label="PLS-DA plot after feature selection on ${on_string}">
-      <filter> pls == True </filter>
-    </data>
+    <data format="xlsx" name="summary_file" 
+          label="Result summary on ${on_string}"/>
 
-    <data format="rdata" name="rda_file" 
-          label="RData file for R resultson ${on_string}" >
-      <filter> rda == True </filter>
+    <data format="xlsx" name="summary_grp_file" 
+          label="Group result summary on ${on_string}" >
+      <filter> grp['grp_selector'] == True </filter>
     </data>
     
   </outputs>
@@ -215,19 +136,18 @@
   <!-- =============================================================== -->
   <tests>
     <test>
-      <param name="data_file" value="tr226_data.tab" />
-      <param name="meta_file" value="tr226_meta.tab" />
-      <param name="group" value="Genotype" /> 
-      <param name="boot" file="TRUE" />
-      <param name="boot_size" value="100" /> 
-      <param name="fs_method" value="fs.welch, fs.auc, fs.rf" /> 
-      <param name="freq_cutoff" value="0.5" /> 
-      <param name="top_k" value="50" /> 
-      <param name="pval_tune" value="TRUE" /> 
-      <param name="pval_thre" value="0.05" /> 
-      <output name="fusion_file" file="fusion.pdf" />
-      <output name="data_fs_file" file="data_fs.tab" />
-      <output name="stats_file" file="stats.tab" />
+      <param name="peak_file" value="xcms_obj.tsv" />
+      <param name="targ_file" value="targets.tsv" />
+      <param name="grp_selector" value="TURE" /> 
+      <param name="groups" value="C12,C12,C12,C12,C13,C13,C13,C13" /> 
+      <param name="pattern_plot" value="TRUE" /> 
+      <param name="residual_plot" value="TRUE" /> 
+      <param name="result_plot" value="TRUE" /> 
+      <output name="pattern_file" file="pattern.pdf" />
+      <output name="residual_file" file="residual.pdf" />
+      <output name="result_file" file="result.pdf" />
+      <output name="summary_file" file="summary.xlsx" />
+      <output name="summary_grp_file" file="stats.tab" />
     </test>
   </tests>
 

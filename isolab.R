@@ -125,8 +125,8 @@ if(com_f){
                result_file   = paste0(tool_dir,"res/result.pdf"),
 
                ## Excel files 
-               summary_file     = paste0(tool_dir,"res/summary.xls"),
-               summary_grp_file = paste0(tool_dir,"res/summary_grp.xls")
+               summary_file     = paste0(tool_dir,"res/summary.xlsx"),
+               summary_grp_file = paste0(tool_dir,"res/summary_grp.xlsx")
                )
 
 }
