@@ -60,35 +60,11 @@
   <configfiles>
     <configfile name="target_matrix">
         #if str($target.target_selector) == "no":
-          #set $header = "Name Time Replicate"
-          #for $group in $source.rep_groups:
-              #set $header = $header + ' ' + str($group.name)
-          #end for
+          #set $header = 'name_compound' + '\t' + 'compound' + '\t' + 'charge' + '\t'  + 'labelling' + '\t' + 'RT' + '\t' + 'RT_shift' + '\t' + 'chrom_width' + '\t' + 'mass_shift' + '\t' + 'initial_abundance'
           $header
-          #set $c = len($source.rep_repl) + 1
-          #for $time in $source.rep_time:
-              #for $file in $time.files:
-                  #set $is_repl = False
-                  #for $i, $repl in enumerate($source.rep_repl):
-                      #if str($file) in str($repl.files):
-                          #set $r = $i + 1
-                          #set $is_repl = True
-                      #end if
-                  #end for
-                  #if $is_repl == False:
-                      #set $r = $c
-                      #set $c += 1
-                  #end if
-                  #set $line = '"' + str($file.name) + '" ' + str($time.time) + ' ' + str($r)
-                  #for $group in $source.rep_groups:
-                      #if str($file) in str($group.files):
-                          #set $line += " 1"
-                      #else
-                          #set $line += " 0"
-                      #end if
-                  #end for
-                  $line
-              #end for
+          #for $t in $target.rep_target:
+            #set $line = str($t.name_compound) + '\t' + str($t.compound) + '\t' + str($t.charge) + '\t' + str($t.labelling) + '\t' + str($t.RT) + '\t' + str($t.RT_shift) + '\t' + str($t.chrom_width) + '\t' + str($t.mass_shift) + '\t' + str($t.initial_abundance)
+            $line
           #end for
         #end if
     </configfile>
@@ -189,9 +165,6 @@
           <param name="mass_shift" type="float" value="0.05"
                  label="Specify a mass shift"
                  help="Only numbers will be allowed">
-            <sanitizer>
-              <valid initial="string.digits"></valid>
-            </sanitizer>
           </param>
 
           <param name="initial_abundance" type="text" value="NA"

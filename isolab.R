@@ -143,6 +143,12 @@ peak <- read.table(opt$peak_file, header = T, sep = "\t",
 targets <- read.table(opt$targ_file, header = T, sep = "\t", 
                    fill = T,stringsAsFactors = F)
 
+## targets <- targets[-3,]
+targets  <- targets[!apply(is.na(targets) | targets == "", 1, all),]
+
+## cat("\n the row names is\n")
+## names(targets)
+
 ## transpose data frame
 targets  <- as.data.frame(t(targets))
 ## targets  <- as.data.frame(t(targets),stringsAsFactors = F)
