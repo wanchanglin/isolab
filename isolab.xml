@@ -11,6 +11,15 @@
   <!-- =============================================================== -->
   <command>
     <![CDATA[
+      #if str($target.target_selector) == "no":
+          #if $target.target_output:
+              ln -f $target_matrix $target_out &&
+          #end if
+          #set $targ_file = $target_matrix
+      #else:
+          #set $targ_file = $target.targ_file
+      #end if
+
       Rscript ${__tool_directory__}/isolab.R
         ## input files
         --peak_file $peak_file 
@@ -48,6 +57,44 @@
   </command>
 
   <!-- =============================================================== -->
+  <configfiles>
+    <configfile name="target_matrix">
+        #if str($target.target_selector) == "no":
+          #set $header = "Name Time Replicate"
+          #for $group in $source.rep_groups:
+              #set $header = $header + ' ' + str($group.name)
+          #end for
+          $header
+          #set $c = len($source.rep_repl) + 1
+          #for $time in $source.rep_time:
+              #for $file in $time.files:
+                  #set $is_repl = False
+                  #for $i, $repl in enumerate($source.rep_repl):
+                      #if str($file) in str($repl.files):
+                          #set $r = $i + 1
+                          #set $is_repl = True
+                      #end if
+                  #end for
+                  #if $is_repl == False:
+                      #set $r = $c
+                      #set $c += 1
+                  #end if
+                  #set $line = '"' + str($file.name) + '" ' + str($time.time) + ' ' + str($r)
+                  #for $group in $source.rep_groups:
+                      #if str($file) in str($group.files):
+                          #set $line += " 1"
+                      #else
+                          #set $line += " 0"
+                      #end if
+                  #end for
+                  $line
+              #end for
+          #end for
+        #end if
+    </configfile>
+  </configfiles>
+
+  <!-- =============================================================== -->
   <inputs>
     <param name="peak_file" type="data"  format="tabular" label="Data matrix" 
            help="Data matrix containing the integrated signals for the
@@ -55,15 +102,114 @@
                  retention time of the peaks; the other columns represent
                  peak intensities for each sample." />
 
-    <param name="targ_file" type="data"  format="tabular" 
-           label="Targets matrix" 
-           help="A data matrix containing information on the target analytes.
-                 Columns 1 to 8 are: 'name_compound' (the name of the target
-                 analytes), 'compound', 'charge', 'labelling', 'RT',
-                 'RT_shift', 'chrom_width', 'mass_shift'.  Columns from 9
-                 onwards contain the initial estimates for the label
-                 abundances (one estimate for each sample). If not known,
-                 a single column of NA values can be entered" />
+    <conditional name="target">
+      <param name="target_selector" type="select"
+             label="Input targets from file?" 
+             help="Choose if you want to provide targets file, or if you
+                   want to enter targets manually.">
+        <option value="yes">Use targets file</option>
+        <option value="no">Enter targets manually</option>
+      </param>
+
+      <when value="yes">
+        <param name="targ_file" type="data"  format="tabular" 
+               label="Targets matrix" 
+               help="A data matrix containing information on the target analytes.
+                     Columns 1 to 8 are: 'name_compound' (the name of the target
+                     analytes), 'compound', 'charge', 'labelling', 'RT',
+                     'RT_shift', 'chrom_width', 'mass_shift'.  Columns from 9
+                     onwards contain the initial estimates for the label
+                     abundances (one estimate for each sample). If not known,
+                     a single column of NA values can be entered" />
+      </when>
+
+      <when value="no">
+        <param name="target_output" type="boolean" truevalue="1" falsevalue="0"
+               checked="true" label="Output generated targets input files?"
+               help="Choose if you want to output the generated targets." />
+
+        <repeat name="rep_target" title="Target" min="1" default="1">
+
+          <param name="name_compound" type="text" value=""
+                 label="Specify a compound name"
+                 help="Letters, numbers and underscores will be allowed">
+            <sanitizer>
+              <valid initial="string.letters,string.digits"><add value="_" /></valid>
+            </sanitizer>
+          </param>
+
+          <param name="compound" type="text" value=""
+                 label="Specify a compound name"
+                 help="Letters and numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.letters,string.digits"></valid>
+            </sanitizer>
+          </param>
+          
+          <param name="charge" type="integer" value="1"
+                 label="Specify a charge value"
+                 help="Only numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.digits"></valid>
+            </sanitizer>
+          </param>
+
+          <param name="labelling" type="text" value="C"
+                 label="Specify a compound name"
+                 help="Letters will be allowed">
+            <sanitizer>
+              <valid initial="string.letters"></valid>
+            </sanitizer>
+          </param>
+          
+          <param name="RT" type="integer" value="285"
+                 label="Specify an retention time"
+                 help="Only numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.digits"></valid>
+            </sanitizer>
+          </param>
+
+          <param name="RT_shift" type="integer" value="20"
+                 label="Specify an retention time shift"
+                 help="Only numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.digits"></valid>
+            </sanitizer>
+          </param>
+
+          <param name="chrom_width" type="integer" value="7"
+                 label="Specify an chrom width"
+                 help="Only numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.digits"></valid>
+            </sanitizer>
+          </param>
+
+          <param name="mass_shift" type="float" value="0.05"
+                 label="Specify a mass shift"
+                 help="Only numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.digits"></valid>
+            </sanitizer>
+          </param>
+
+          <param name="initial_abundance" type="text" value="NA"
+                 label="Specify an initial abundance"
+                 help="Letters and numbers will be allowed">
+            <sanitizer>
+              <valid initial="string.letters,string.digits"></valid>
+            </sanitizer>
+          </param>
+          
+        </repeat>
+
+
+      </when>
+      
+    </conditional>
+    <!-- wl: end of <conditional name="target"> -->
+    
 
     <!-- =============================================================== -->
     <conditional name="grp">
@@ -104,6 +250,15 @@
 
   <!-- =============================================================== -->
   <outputs>
+    <data format="txt" name="target_out" label="Target file on ${on_string}">
+      <filter>
+        (( 
+        target['target_selector'] == 'no' and
+        target['target_output'] == True 
+        ))
+      </filter>
+    </data>
+
     <data format="pdf" name="pattern_file"
           label="Pattern plot on ${on_string}">
       <filter> pattern_plot == True </filter>
