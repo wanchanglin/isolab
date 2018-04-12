@@ -1,8 +1,6 @@
 <!--
-    wl-22-01-2018, Mon: commence
-    wl-23-01-2018, Tue: first working draft
-    wl-14-02-2018, Wed: change text file format as tabular
-    wl-15-02-2018, Thu: the second version
+    wl-11-04-2018, wed: commence
+    wl-12-04-2018, Thu: first working draft
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -19,14 +17,14 @@
         --targ_file $targ_file 
         
         ## Average estimate for groups
-        --grp $grp
+        --grp $grp.grp_selector
         #if $grp:
-          --groups $groups
+          --groups $grp.groups
         #end if
 
         ## Plot results
         --pattern_plot $pattern_plot
-        --residual_plot $redidual_plot
+        --residual_plot $residual_plot
         --result_plot $result_plot 
 
         ## output pdf files
@@ -87,20 +85,17 @@
     </conditional>
 
     <!-- =============================================================== -->
-    <param name="pattern_plot" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true"
-           label="Plot patterns" 
+    <param name="pattern_plot" type="boolean" truevalue="True" 
+           falsevalue="False" checked="true" label="Plot patterns" 
            help="Plot the normalized experimental pattern superimposed to 
            its fitted theoretical pattern." />
-    <param name="residual_plot" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true"
-           label="Plot residuals" 
-           help="Plot the residuals (the differences between experimental 
-           and best fitted theoretical patterns)" />
-    <param name="result_plot" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true"
-           label="Plot results" 
-           help="Plot a summary showing the estimated percentage abundances
+    <param name="residual_plot" type="boolean" truevalue="True" 
+           falsevalue="False" checked="true" label="Plot residuals" 
+           help="Plot the residuals (the differences between 
+           experimental and best fitted theoretical patterns)" />
+    <param name="result_plot" type="boolean" truevalue="True" 
+           falsevalue="False" checked="true" label="Plot results" 
+           help="Plot summary showing the estimated percentage abundances
            with related standard errors." />
 
   </inputs>
@@ -112,20 +107,16 @@
           label="Pattern plot on ${on_string}">
       <filter> pattern_plot == True </filter>
     </data>
-
     <data format="pdf" name="residual_file"
           label="Residual plot on ${on_string}">
       <filter> residual_plot == True </filter>
     </data>
-
     <data format="pdf" name="result_file"
           label="Result summary plot on ${on_string}">
       <filter> result_plot == True </filter>
     </data>
-
     <data format="xlsx" name="summary_file" 
           label="Result summary on ${on_string}"/>
-
     <data format="xlsx" name="summary_grp_file" 
           label="Group result summary on ${on_string}" >
       <filter> grp['grp_selector'] == True </filter>
@@ -147,7 +138,7 @@
       <output name="residual_file" file="residual.pdf" />
       <output name="result_file" file="result.pdf" />
       <output name="summary_file" file="summary.xlsx" />
-      <output name="summary_grp_file" file="stats.tab" />
+      <output name="summary_grp_file" file="summary_grp.xlsx" />
     </test>
   </tests>
 

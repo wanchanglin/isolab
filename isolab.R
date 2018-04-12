@@ -13,7 +13,7 @@
 rm(list=ls(all=T))
 
 ## flag for command-line use or not. If false, only for debug interactively.
-com_f  <- F
+com_f  <- T
 
 ## ------------------------------------------------------------------------
 ## galaxy will stop even if R has warning message
