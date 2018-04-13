@@ -1,6 +1,8 @@
 <!--
     wl-11-04-2018, wed: commence
     wl-12-04-2018, Thu: first working draft
+    wl-13-04-2018, Fri: enter target information manually. The main 
+       reference is galaxy tool 'masigpro'.
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -57,6 +59,9 @@
   </command>
 
   <!-- =============================================================== -->
+  <!-- wl-13-04-2018, Fri: Beware that produced text file has two empty
+       rows, the first row and bottom row. R can remove the first row 
+       automatically, but you must remove the bottom row by yourself.  -->
   <configfiles>
     <configfile name="target_matrix">
         #if str($target.target_selector) == "no":
@@ -109,13 +114,13 @@
           <param name="name_compound" type="text" value=""
                  label="Specify a compound name"
                  help="Letters, numbers and underscores will be allowed">
-            <sanitizer>
-              <valid initial="string.letters,string.digits"><add value="_" /></valid>
-            </sanitizer>
+            <!-- <sanitizer> -->
+            <!--   <valid initial="string.letters,string.digits"><add value="_" /></valid> -->
+            <!-- </sanitizer> -->
           </param>
 
           <param name="compound" type="text" value=""
-                 label="Specify a compound name"
+                 label="Specify a compound"
                  help="Letters and numbers will be allowed">
             <sanitizer>
               <valid initial="string.letters,string.digits"></valid>
@@ -223,7 +228,7 @@
 
   <!-- =============================================================== -->
   <outputs>
-    <data format="txt" name="target_out" label="Target file on ${on_string}">
+    <data format="tabular" name="target_out" label="Target file on ${on_string}">
       <filter>
         (( 
         target['target_selector'] == 'no' and

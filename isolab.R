@@ -4,10 +4,8 @@
 ## formats
 ## wl-10-04-2018, Tue: substantial changes.
 ## wl-11-04-2018, Wed: command line and change plot function
-## ----------------------------------------------------------------------
-## To-DO: 
-##  1.) XML file and repeat input in Galaxy
-##  2.) test single row data frame
+## wl-12-04-2018, Thu: deal with empty bottom rows in Galaxy produced target
+## files.
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -108,7 +106,8 @@ if(com_f){
   opt  <- list(
                ## input files
                peak_file    = paste0(tool_dir,"test-data/xcms_obj.tsv"),
-               targ_file    = paste0(tool_dir,"test-data/targets.tsv"),
+               ## targ_file    = paste0(tool_dir,"test-data/targets.tsv"),
+               targ_file    = paste0(tool_dir,"test-data/targets_galaxy.tsv"),
 
                ## group abundance estimate
                grp            = "TRUE",
@@ -138,16 +137,17 @@ suppressPackageStartupMessages({
 ## Load peak table
 peak <- read.table(opt$peak_file, header = T, sep = "\t", 
                    fill = T,stringsAsFactors = F)
+## cat("\n the row names is\n")
 
 ## Load batch parameters
 targets <- read.table(opt$targ_file, header = T, sep = "\t", 
-                   fill = T,stringsAsFactors = F)
+                      fill = T,stringsAsFactors = F)
 
-## targets <- targets[-3,]
-targets  <- targets[!apply(is.na(targets) | targets == "", 1, all),]
-
-## cat("\n the row names is\n")
-## names(targets)
+## wl-13-04-2018, Fri: targets file produced by galaxy will have empty
+## bottom rows. Must remove any empty rows.
+tmp     <- targets[,-ncol(targets)]
+idx     <- complete.cases(tmp)
+targets <- targets[idx,]
 
 ## transpose data frame
 targets  <- as.data.frame(t(targets))
@@ -219,6 +219,7 @@ if (opt$grp) {
 }
 
 ## =======================================================================
+## wl-13-04-2018, Fri: Original codes and other debug information.
 if (F) {
 
   info <- isotopic_information(compound="X40H77NO8P", labelling="C")
@@ -227,7 +228,7 @@ if (F) {
 
   patterns <- isotopic_pattern(peak, info, mass_shift=0.05,
                                RT=285, RT_shift=20, chrom_width=7) 
-  ## View(patterns)       
+  View(patterns)       
 
   fitted <- find_abundance(patterns=patterns, info=info,
                            initial_abundance=NA, charge=1)
@@ -241,7 +242,7 @@ if (F) {
   names(fitted)
   summary(fitted)
 
-  save_labelling(fitted)
+  ## save_labelling(fitted)
 
   ## Plot
   plot(x=fitted, type="patterns", saveplots=F)
@@ -253,6 +254,7 @@ if (F) {
   grp_est 
 
   ## Batch-process
+  ## wl-13-04-2018, Fri: here 'targets' should not be transposed.
   bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
                                  groups=factor(c(rep("C12",4), rep("C13",4))),
                                  plot_patterns=F, plot_residuals=F,
