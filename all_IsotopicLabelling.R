@@ -1,8 +1,9 @@
 ## ======================================================================
 ## wl-24-02-2018, Sat: commence for debug and test
+## wl-08-05-2018, Tue: create an remote repository: https://github.com/wanchanglin/isolab 
 ## ======================================================================
-## Notes:
-##  1) use other R packages: xcms, ecipex, stringr, gsubfn
+
+## Notes: Use other R packages: xcms, ecipex, stringr, gsubfn
 
 
 #' ========================================================================
