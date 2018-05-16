@@ -29,7 +29,7 @@
         
         ## Average estimate for groups
         --grp $grp.grp_selector
-        #if $grp:
+        #if $grp.grp_selector:
           --groups $grp.groups
         #end if
 
@@ -51,7 +51,7 @@
 
         ## Output Excel files
         --summary_file $summary_file 
-        #if $grp:
+        #if $grp.grp_selector:
            --summary_grp_file $summary_grp_file
         #end if
 
@@ -136,7 +136,7 @@
           </param>
 
           <param name="labelling" type="text" value="C"
-                 label="Specify a compound name"
+                 label="Specify a labelling isotope"
                  help="Letters will be allowed">
             <sanitizer>
               <valid initial="string.letters"></valid>
@@ -160,7 +160,7 @@
           </param>
 
           <param name="chrom_width" type="integer" value="7"
-                 label="Specify an chrom width"
+                 label="Specify a chrom width"
                  help="Only numbers will be allowed">
             <sanitizer>
               <valid initial="string.digits"></valid>
