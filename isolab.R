@@ -51,7 +51,7 @@ if(com_f){
   ## prog_name <- basename(func())
   tool_dir <- paste0(dirname(func()),"/")
 
-  option_list <- 
+  option_list <-
     list(
          make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
                      help="Print extra output [default]"),
@@ -63,15 +63,15 @@ if(com_f){
          make_option("--peak_file", type="character",
                      help="Peak table with m/z, retention time and intensity"),
          make_option("--targ_file", type="character",
-                     help="Parameter data metrix in which each row is one 
+                     help="Parameter data metrix in which each row is one
                            instance of setting for ananlysis"),
 
          ## group abundance estimate
          make_option("--grp", type="logical", default=TRUE,
-                     help="Apply group estimates of abundance"), 
+                     help="Apply group estimates of abundance"),
          make_option("--groups",type="character",
                      help="Group information for samples"),
-                     
+
          ## plot output
          make_option("--pattern_plot", type="logical", default=TRUE,
                      help="Plot patterns"),
@@ -80,7 +80,7 @@ if(com_f){
          make_option("--result_plot", type="logical", default=TRUE,
                      help="Plot results"),
 
-         ## pdf files 
+         ## pdf files
          make_option("--pattern_file",type="character", default="pattern.pdf",
                      help="Save pattern plot"),
          make_option("--residual_file",type="character", default="residual.pdf",
@@ -88,7 +88,7 @@ if(com_f){
          make_option("--result_file",type="character", default="result.pdf",
                      help="Save result plot"),
 
-         ## Excel files 
+         ## Excel files
          make_option("--summary_file",type="character",default="summary.xls",
                      help="Save summary results in Excel"),
          make_option("--summary_grp_file",type="character",
@@ -105,25 +105,24 @@ if(com_f){
   tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
   opt  <- list(
                ## input files
-               peak_file    = paste0(tool_dir,"test-data/xcms_obj.tsv"),
-               ## targ_file    = paste0(tool_dir,"test-data/targets.tsv"),
-               targ_file    = paste0(tool_dir,"test-data/targets_galaxy.tsv"),
+               peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
+               targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
 
                ## group abundance estimate
-               grp            = "TRUE",
-               groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
+               grp           = "FALSE",
+               ## groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
 
                ## plot output
                pattern_plot  = TRUE,
                residual_plot = TRUE,
                result_plot   = TRUE,
 
-               ## pdf files 
+               ## pdf files
                pattern_file  = paste0(tool_dir,"res/pattern.pdf"),
                residual_file = paste0(tool_dir,"res/residual.pdf"),
                result_file   = paste0(tool_dir,"res/result.pdf"),
 
-               ## Excel files 
+               ## Excel files
                summary_file     = paste0(tool_dir,"res/summary.xlsx"),
                summary_grp_file = paste0(tool_dir,"res/summary_grp.xlsx")
                )
@@ -135,12 +134,12 @@ suppressPackageStartupMessages({
 })
 
 ## Load peak table
-peak <- read.table(opt$peak_file, header = T, sep = "\t", 
+peak <- read.table(opt$peak_file, header = T, sep = "\t",
                    fill = T,stringsAsFactors = F)
 ## cat("\n the row names is\n")
 
 ## Load batch parameters
-targets <- read.table(opt$targ_file, header = T, sep = "\t", 
+targets <- read.table(opt$targ_file, header = T, sep = "\t",
                       fill = T,stringsAsFactors = F)
 
 ## wl-13-04-2018, Fri: targets file produced by galaxy will have empty
@@ -155,7 +154,7 @@ targets  <- as.data.frame(t(targets))
 ## targets  <- as.list(targets)
 
 ## batch process
-res_bat <- lapply(targets,function(x){ ## x = targets[[1]] 
+res_bat <- lapply(targets,function(x){ ## x = targets[[1]]
 
   info <- isotopic_information(compound  = as.character(x["compound"]),
                               charge    = as.numeric(as.character(x["charge"])),
@@ -177,9 +176,9 @@ res_bat <- lapply(targets,function(x){ ## x = targets[[1]]
 })
 names(res_bat) <- as.character(unlist(targets[2,]))
 
-## ---------------------------------------------------------------------- 
+## ----------------------------------------------------------------------
 ## Process the results
-## ---------------------------------------------------------------------- 
+## ----------------------------------------------------------------------
 
 ## Plots
 if (opt$pattern_plot) {
@@ -214,7 +213,7 @@ if (opt$grp) {
   groups <- factor(groups)
 
   summ_grp <- lapply(res_bat, function(x) group_labelling(x, groups = groups))
-  WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T, 
+  WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T,
            FreezeRow = 1)
 }
 
@@ -223,20 +222,20 @@ if (opt$grp) {
 if (F) {
 
   info <- isotopic_information(compound="X40H77NO8P", labelling="C")
-  names(info)  
+  names(info)
   info$isotopes
 
   patterns <- isotopic_pattern(peak, info, mass_shift=0.05,
-                               RT=285, RT_shift=20, chrom_width=7) 
-  View(patterns)       
+                               RT=285, RT_shift=20, chrom_width=7)
+  View(patterns)
 
   fitted <- find_abundance(patterns=patterns, info=info,
                            initial_abundance=NA, charge=1)
 
   ## Or use wrapper function
-  fitted <- main_labelling(peak, compound="X40H77NO8P", 
-                           charge=1, labelling="C", mass_shift=0.05, 
-                           RT=285, RT_shift=20, chrom_width=7, 
+  fitted <- main_labelling(peak, compound="X40H77NO8P",
+                           charge=1, labelling="C", mass_shift=0.05,
+                           RT=285, RT_shift=20, chrom_width=7,
                            initial_abundance=NA)
 
   names(fitted)
@@ -251,7 +250,7 @@ if (F) {
 
   ## Group the samples and obtain grouped estimates
   grp_est <- group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
-  grp_est 
+  grp_est
 
   ## Batch-process
   ## wl-13-04-2018, Fri: here 'targets' should not be transposed.
@@ -268,16 +267,16 @@ if (F) {
   ## load("./test-data/xcms_obj.rda") ## data("xcms_obj")
   ## peak <- table_xcms(xcms_obj)
   ## write.table(peak, file="./test-data/xcms_obj.tsv", sep = "\t",
-  ##             row.names = FALSE, quote = FALSE) 
+  ##             row.names = FALSE, quote = FALSE)
 
   ## ------------------------------------------------------------------------
   ## Get the example data frame containing target abalytes
   # load("./test-data/targets.rda") ## data("targets")
   # write.table(targets,file="./test-data/targets.tsv", sep="\t",
-  #             row.names = FALSE, quote = FALSE) 
+  #             row.names = FALSE, quote = FALSE)
 
   ## ------------------------------------------------------------------------
-  ## para  <- c("compound", "charge", "labelling", "RT", "RT_shift", 
+  ## para  <- c("compound", "charge", "labelling", "RT", "RT_shift",
   ##            "chrom_width", "mass_shift", "initial_abundance")
   ## targets <- targets[,para]
 
