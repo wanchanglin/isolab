@@ -1,9 +1,8 @@
 ## ======================================================================
-## wl-24-02-2018, Sat: commence for debug and test
+## wl-24-02-2018, Sat: commence for debug and test. Notes: Use other R
+##   packages: xcms, ecipex, stringr, gsubfn
 ## wl-08-05-2018, Tue: create an remote repository: https://github.com/wanchanglin/isolab 
 ## ======================================================================
-
-## Notes: Use other R packages: xcms, ecipex, stringr, gsubfn
 
 
 #' ========================================================================
@@ -1019,6 +1018,12 @@ table_xcms <- function(xcms_obj){
 #' @author Ruggero Ferrazza, Pietro Franceschi
 NULL
 
+
+#' ========================================================================
+#' WL: Slightly modification of function 'plot.labelling' for Galaxy only.
+#' 
+#' wl-22-05-2018, Tue: For details, see 'plot.labelling'
+#' -----------------------------------------------------------------------
 plot.func <- function(x, type="patterns", ...){
 
   sample_name <- names(x$best_estimate)

@@ -6,12 +6,13 @@
 ## wl-11-04-2018, Wed: command line and change plot function
 ## wl-12-04-2018, Thu: deal with empty bottom rows in Galaxy produced target
 ## files.
+## wl-22-05-2018, Tue: test new group
 ## ======================================================================
 
 rm(list=ls(all=T))
 
 ## flag for command-line use or not. If false, only for debug interactively.
-com_f  <- T
+com_f  <- F
 
 ## ------------------------------------------------------------------------
 ## galaxy will stop even if R has warning message
@@ -24,7 +25,7 @@ options(warn=-1) ## disable R warning. Turn back: options(warn=0)
 ##   q( "no", 1, F )
 ## })
 
-# we need that to not crash galaxy with an UTF8 error on German LC settings.
+## we need that to not crash galaxy with an UTF8 error on German LC settings.
 loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
@@ -53,48 +54,48 @@ if(com_f){
 
   option_list <-
     list(
-         make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
-                     help="Print extra output [default]"),
-         make_option(c("-q", "--quietly"), action="store_false",
-                     dest="verbose", help="Print little output"),
+        make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
+                    help="Print extra output [default]"),
+        make_option(c("-q", "--quietly"), action="store_false",
+                    dest="verbose", help="Print little output"),
 
-         ## -------------------------------------------------------------------
-         ## input files
-         make_option("--peak_file", type="character",
-                     help="Peak table with m/z, retention time and intensity"),
-         make_option("--targ_file", type="character",
-                     help="Parameter data metrix in which each row is one
-                           instance of setting for ananlysis"),
+        ## -------------------------------------------------------------------
+        ## input files
+        make_option("--peak_file", type="character",
+                    help="Peak table with m/z, retention time and intensity"),
+        make_option("--targ_file", type="character",
+                    help="Parameter data metrix in which each row is one
+                           instance of setting for analysis"),
 
-         ## group abundance estimate
-         make_option("--grp", type="logical", default=TRUE,
-                     help="Apply group estimates of abundance"),
-         make_option("--groups",type="character",
-                     help="Group information for samples"),
+        ## group abundance estimate
+        make_option("--grp", type="logical", default=TRUE,
+                    help="Apply group estimates of abundance"),
+        make_option("--groups",type="character",
+                    help="Group information for samples"),
 
-         ## plot output
-         make_option("--pattern_plot", type="logical", default=TRUE,
-                     help="Plot patterns"),
-         make_option("--residual_plot", type="logical", default=TRUE,
-                     help="Plot residuals"),
-         make_option("--result_plot", type="logical", default=TRUE,
-                     help="Plot results"),
+        ## plot output
+        make_option("--pattern_plot", type="logical", default=TRUE,
+                    help="Plot patterns"),
+        make_option("--residual_plot", type="logical", default=TRUE,
+                    help="Plot residuals"),
+        make_option("--result_plot", type="logical", default=TRUE,
+                    help="Plot results"),
 
-         ## pdf files
-         make_option("--pattern_file",type="character", default="pattern.pdf",
-                     help="Save pattern plot"),
-         make_option("--residual_file",type="character", default="residual.pdf",
-                     help="Save residual plot"),
-         make_option("--result_file",type="character", default="result.pdf",
-                     help="Save result plot"),
+        ## pdf files
+        make_option("--pattern_file",type="character", default="pattern.pdf",
+                    help="Save pattern plot"),
+        make_option("--residual_file",type="character", default="residual.pdf",
+                    help="Save residual plot"),
+        make_option("--result_file",type="character", default="result.pdf",
+                    help="Save result plot"),
 
-         ## Excel files
-         make_option("--summary_file",type="character",default="summary.xls",
-                     help="Save summary results in Excel"),
-         make_option("--summary_grp_file",type="character",
-                     default="summary_grp.xls",
-                     help="Save group summary results")
-         )
+        ## Excel files
+        make_option("--summary_file",type="character",default="summary.xls",
+                    help="Save summary results in Excel"),
+        make_option("--summary_grp_file",type="character",
+                    default="summary_grp.xls",
+                    help="Save group summary results")
+    )
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
                     args = commandArgs(trailingOnly = TRUE))
@@ -104,28 +105,29 @@ if(com_f){
   ## tool_dir <- "C:/R_lwc/isolab/"         ## for windows
   tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
   opt  <- list(
-               ## input files
-               peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
-               targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
+      ## input files
+      peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
+      targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
 
-               ## group abundance estimate
-               grp           = "FALSE",
-               ## groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
+      ## group abundance estimate
+      grp           = "TRUE",
+      groups        = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
+      ## groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
 
-               ## plot output
-               pattern_plot  = TRUE,
-               residual_plot = TRUE,
-               result_plot   = TRUE,
+      ## plot output
+      pattern_plot  = TRUE,
+      residual_plot = TRUE,
+      result_plot   = TRUE,
 
-               ## pdf files
-               pattern_file  = paste0(tool_dir,"res/pattern.pdf"),
-               residual_file = paste0(tool_dir,"res/residual.pdf"),
-               result_file   = paste0(tool_dir,"res/result.pdf"),
+      ## pdf files
+      pattern_file  = paste0(tool_dir,"res/pattern.pdf"),
+      residual_file = paste0(tool_dir,"res/residual.pdf"),
+      result_file   = paste0(tool_dir,"res/result.pdf"),
 
-               ## Excel files
-               summary_file     = paste0(tool_dir,"res/summary.xlsx"),
-               summary_grp_file = paste0(tool_dir,"res/summary_grp.xlsx")
-               )
+      ## Excel files
+      summary_file     = paste0(tool_dir,"res/summary.xlsx"),
+      summary_grp_file = paste0(tool_dir,"res/summary_grp.xlsx")
+  )
 
 }
 
@@ -157,15 +159,15 @@ targets  <- as.data.frame(t(targets))
 res_bat <- lapply(targets,function(x){ ## x = targets[[1]]
 
   info <- isotopic_information(compound  = as.character(x["compound"]),
-                              charge    = as.numeric(as.character(x["charge"])),
-                              labelling = as.character(x["labelling"]))
+                               charge    = as.numeric(as.character(x["charge"])),
+                               labelling = as.character(x["labelling"]))
 
   patterns <- isotopic_pattern(peak_table  = peak,
-                              info        = info,
-                              mass_shift  = as.numeric(as.character(x["mass_shift"])),
-                              RT          = as.numeric(as.character(x["RT"])),
-                              RT_shift    = as.numeric(as.character(x["RT_shift"])),
-                              chrom_width = as.numeric(as.character(x["chrom_width"])))
+                               info        = info,
+                               mass_shift  = as.numeric(as.character(x["mass_shift"])),
+                               RT          = as.numeric(as.character(x["RT"])),
+                               RT_shift    = as.numeric(as.character(x["RT_shift"])),
+                               chrom_width = as.numeric(as.character(x["chrom_width"])))
 
   res <- find_abundance(patterns          = patterns,
                         info              = info,
@@ -271,9 +273,9 @@ if (F) {
 
   ## ------------------------------------------------------------------------
   ## Get the example data frame containing target abalytes
-  # load("./test-data/targets.rda") ## data("targets")
-  # write.table(targets,file="./test-data/targets.tsv", sep="\t",
-  #             row.names = FALSE, quote = FALSE)
+                                        # load("./test-data/targets.rda") ## data("targets")
+                                        # write.table(targets,file="./test-data/targets.tsv", sep="\t",
+                                        #             row.names = FALSE, quote = FALSE)
 
   ## ------------------------------------------------------------------------
   ## para  <- c("compound", "charge", "labelling", "RT", "RT_shift",
