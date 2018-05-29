@@ -106,13 +106,15 @@ if(com_f){
   tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
   opt  <- list(
       ## input files
-      peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
+      peak_file    = paste0(tool_dir,"test-data/xcms.tsv"),
+      ## targ_file    = paste0(tool_dir,"test-data/xcms_tar.tsv"),
+      groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
+      ## peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
       targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
+      ## groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       ## group abundance estimate
       grp           = "TRUE",
-      groups        = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
-      ## groups        = "C12,C12,C12,C12,C13,C13,C13,C13",
 
       ## plot output
       pattern_plot  = TRUE,
