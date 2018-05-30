@@ -12,7 +12,7 @@
 rm(list=ls(all=T))
 
 ## flag for command-line use or not. If false, only for debug interactively.
-com_f  <- F
+com_f  <- T
 
 ## ------------------------------------------------------------------------
 ## galaxy will stop even if R has warning message
@@ -106,12 +106,12 @@ if(com_f){
   tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
   opt  <- list(
       ## input files
-      peak_file    = paste0(tool_dir,"test-data/xcms.tsv"),
+      ## peak_file    = paste0(tool_dir,"test-data/xcms.tsv"),
       ## targ_file    = paste0(tool_dir,"test-data/xcms_tar.tsv"),
-      groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
-      ## peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
+      ## groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
+      peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
       targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
-      ## groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
+      groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       ## group abundance estimate
       grp           = "TRUE",
@@ -158,7 +158,7 @@ targets  <- as.data.frame(t(targets))
 ## targets  <- as.list(targets)
 
 ## batch process
-res_bat <- lapply(targets,function(x){ ## x = targets[[1]]
+res_bat <- lapply(targets,function(x){  ##  x = targets[[1]]
 
   info <- isotopic_information(compound  = as.character(x["compound"]),
                                charge    = as.numeric(as.character(x["charge"])),
@@ -222,30 +222,29 @@ if (opt$grp) {
 }
 
 ## =======================================================================
-## wl-13-04-2018, Fri: Original codes and other debug information.
+## wl-13-04-2018, Fri: step-by-step debug codes.
 if (F) {
-
+  ## ---------------------------------------------------------------------
   info <- isotopic_information(compound="X40H77NO8P", labelling="C")
-  names(info)
-  info$isotopes
+  ## names(info)
+  ## info$isotopes
 
   patterns <- isotopic_pattern(peak, info, mass_shift=0.05,
-                               RT=285, RT_shift=20, chrom_width=7)
-  View(patterns)
+                               RT=385, RT_shift=10, chrom_width=9)
+  ## View(patterns)
 
   fitted <- find_abundance(patterns=patterns, info=info,
                            initial_abundance=NA, charge=1)
-
-  ## Or use wrapper function
-  fitted <- main_labelling(peak, compound="X40H77NO8P",
-                           charge=1, labelling="C", mass_shift=0.05,
-                           RT=285, RT_shift=20, chrom_width=7,
-                           initial_abundance=NA)
-
-  names(fitted)
-  summary(fitted)
-
+  ## names(fitted)
+  ## summary(fitted)
   ## save_labelling(fitted)
+
+  ## ---------------------------------------------------------------------
+  ## Or use wrapper function
+  fitted <- main_labelling(peak, compound="X51H94NO6",
+                           charge=1, labelling="C", mass_shift=0.05,
+                           RT=350, RT_shift=20, chrom_width=7,
+                           initial_abundance=NA)
 
   ## Plot
   plot(x=fitted, type="patterns", saveplots=F)
@@ -253,16 +252,24 @@ if (F) {
   plot(x=fitted, type="summary", saveplots=F)
 
   ## Group the samples and obtain grouped estimates
-  grp_est <- group_labelling(fitted,groups=factor(c(rep("C12",4), rep("C13",4))))
+  ## groups <- factor(c(rep("C12",4), rep("C13",4))) 
+  groups  <- "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu"
+  groups  <- unlist(strsplit(groups,","))
+  groups  <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
+  groups  <- factor(groups)
+
+  grp_est <- group_labelling(fitted,groups=groups)
   grp_est
 
   ## Batch-process
-  ## wl-13-04-2018, Fri: here 'targets' should not be transposed.
-  bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
-                                 groups=factor(c(rep("C12",4), rep("C13",4))),
-                                 plot_patterns=F, plot_residuals=F,
-                                 plot_results=F, save_results=T)
-  bat_grp_est
+  ## wl-13-04-2018, Fri: Not work. Here 'targets' should not be transposed.
+  ## wl-30-05-2018, Wed: Should change the original R codes
+  ## -----------------------------------------------------------------------
+  ## bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
+  ##                                groups=groups,
+  ##                                plot_patterns=F, plot_residuals=F,
+  ##                                plot_results=F, save_results=F)
+  ## bat_grp_est
 
   ## -----------------------------------------------------------------------
   ## Use data set from xcms
