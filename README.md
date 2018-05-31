@@ -44,7 +44,9 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 ## To-Do ##
 
 - Dependencies will be handled by CONDA. This includes all R packages used.
-- Any other issues
+- White spaces in 'groups' input: Current no any white spaces are allowed.
+  Note that 'isolab.sh' has no problem with white spaces. Probably it is
+  'Cheetah' or Galaxy's text input problem.(31-05-2018, Thu) 
 
 ## Authors, contributors & contacts ##
 

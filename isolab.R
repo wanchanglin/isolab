@@ -111,7 +111,7 @@ if(com_f){
       ## groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
       peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
       targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
-      groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
+      groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       ## group abundance estimate
       grp           = "TRUE",
@@ -225,7 +225,7 @@ if (opt$grp) {
 ## wl-13-04-2018, Fri: step-by-step debug codes.
 if (F) {
   ## ---------------------------------------------------------------------
-  info <- isotopic_information(compound="X40H77NO8P", labelling="C")
+  info <- isotopic_information(compound="X51H98O6", labelling="C")
   ## names(info)
   ## info$isotopes
 
@@ -241,9 +241,9 @@ if (F) {
 
   ## ---------------------------------------------------------------------
   ## Or use wrapper function
-  fitted <- main_labelling(peak, compound="X51H94NO6",
+  fitted <- main_labelling(peak, compound="X51H98O6",
                            charge=1, labelling="C", mass_shift=0.05,
-                           RT=350, RT_shift=20, chrom_width=7,
+                           RT=380, RT_shift=10, chrom_width=7,
                            initial_abundance=NA)
 
   ## Plot
