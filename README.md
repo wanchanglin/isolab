@@ -44,7 +44,9 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 ## To-Do ##
 
 - Dependencies will be handled by CONDA. This includes all R packages used.
-- White spaces in 'groups' input: Current no any white spaces are allowed.
+
+- White spaces in 'groups' input: Group factor delimiter is comma. No any
+  extra white spaces are allowed otherwise an error will be encountered.
   Note that 'isolab.sh' has no problem with white spaces. Probably it is
   'Cheetah' or Galaxy's text input problem.(31-05-2018, Thu) 
 
