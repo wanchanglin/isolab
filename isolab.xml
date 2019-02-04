@@ -225,7 +225,6 @@
 
   </inputs>
 
-
   <!-- =============================================================== -->
   <outputs>
     <data format="tabular" name="target_out" label="Target file on ${on_string}">
@@ -276,10 +275,82 @@
     </test>
   </tests>
 
-
   <!-- =============================================================== -->
   <help>
-    This is a basic Galaxy wrapper for pre-processing. 
+Mass Spectrometric Isotopic Labelling
+======================================
+
+Description
+-----------
+
+This Galaxy tool wraps R package *IsotopicLabelling* to analyse mass
+spectrometric isotopic patterns obtained following isotopic labelling
+experiments.
+
+A typical labelling experiment makes use of substrates enriched in one
+stable isotope, such as :sup:`2`\H or :sup:`13`\C; consequently, after the
+growth period, some metabolites are expected to have incorporated the
+labelling isotope, and therefore its relative distribution within them will
+be different from its natural occurrence. The *IsotopicLabelling* R package
+is based on the principle that, since the isotopic patterns obtained in mass
+spectrometry reflect the isotopic compositions of the elements making up the
+observed species, the amount of labelling can be assessed by their proper
+examination. 
+
+Worth of note, because there could be overlapping between the isotopic
+patterns of different species, the isotopic pattern analysis is better
+suited for LC-MS or GC-MS data rather than for direct-infusion MS, where the
+chromatographic step prior to MS detection reduces such issues. Therefore,
+the current implementation of the package only works for LC-MS or GC-MS
+data. (from  `IsotopicLabelling R Package - a Practical Guide`_)
+
+
+.. _IsotopicLabelling R Package - a Practical Guide: https://goo.gl/YihqMN
+
+Inputs
+------
+
+**\1. Data matrix**
+
+The input data matrix contains the peak information (m/z, retention time
+(RT) and intensities or areas). It is a tabular format, as shown in:
+
+=======   ========   ================   ================   ================
+mz        rt         C12_Sample_1       C12_Sample_2       C12_Sample_3
+=======   ========   ================   ================   ================
+69.0614   924.0013   284.464073046383   NA                 NA
+74.0727   923.6565   NA                 NA                 NA
+83.0756   947.1894   NA                 257.604382614333   NA
+83.0735   923.2468   NA                 279.519771843507   NA
+87.0323   41.40342   649.483932967305   741.9676456541     504.504348420549
+89.0485   33.71593   1150.01212480098   857.503254338704   1280.96569019438
+=======   ========   ================   ================   ================
+
+      |
+
+**\2. Target matrix**
+  
+The target matrix in tabular format(``.tsv``) includes information on the target analytes. 
+The following table is an example:
+
+===============   ===========   ======   =========   ===   ========   ===========   ==========    =================      
+name_compound     compound      charge   labelling   RT    RT_shift   chrom_width   mass_shift    initial_abundance
+===============   ===========   ======   =========   ===   ========   ===========   ==========    =================      
+[PC_32_2+H]+      X40H77NO8P    1        C           285   20         7             0.05          NA
+[PC_32_1+H]+      X40H79NO8P    1        C           360   20         10            0.05          NA
+[PC_34_2+H]+      X42H81NO8P    1        C           370   30         13            0.05          NA
+[PC_34_1+H]+      X42H83NO8P    1        C           474   30         16            0.05          NA
+[TAG_48_3+NH4]+   X51H96NO6     1        C           900   20         9             0.05          NA
+[TAG_48_2+NH4]+   X51H98NO6     1        C           920   20         9             0.05          NA
+[TAG_50_3+NH4]+   X53H100NO6    1        C           921   20         9             0.05          NA
+[TAG_50_2+NH4]+   X53H102NO6    1        C           939   20         8             0.05          NA
+[TAG_52_2+NH4]+   X55H106NO6    1        C           957   20         8             0.05          NA
+===============   ===========   ======   =========   ===   ========   ===========   ==========    =================      
+
+
+Parameters
+----------
+
   </help>
 
 </tool>
