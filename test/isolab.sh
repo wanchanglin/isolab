@@ -3,13 +3,15 @@
 
   # --peak_file "../test-data/ecamam12.tsv" \
   # --targ_file "../test-data/ecamam12_tar.tsv" \
-  # --group  "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu" \
+  # --groups  "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu" \
 
 Rscript --vanilla ../isolab.R \
   --peak_file "../test-data/xcms.tsv" \
   --targ_file "../test-data/xcms_tar.tsv" \
-  --group  "C12, C12, C12, C12, C13, C13, C13, C13" \
   --grp TRUE \
+  --grp_file_sel "yes" \
+  --grp_file "../test-data/xcms_grp.tsv" \
+  --groups  "C12, C12, C12, C12, C13, C13, C13, C13" \
   --pattern_plot TRUE \
   --residual_plot TRUE \
   --result_plot TRUE \

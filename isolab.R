@@ -7,6 +7,7 @@
 ## wl-12-04-2018, Thu: deal with empty bottom rows in Galaxy produced target
 ## files.
 ## wl-22-05-2018, Tue: test new group
+## wl-05-02-2019, Tue: load group info from file
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -70,8 +71,12 @@ if(com_f){
         ## group abundance estimate
         make_option("--grp", type="logical", default=TRUE,
                     help="Apply group estimates of abundance"),
-        make_option("--groups",type="character",
-                    help="Group information for samples"),
+        make_option("--grp_file_sel", type="character", default="yes",
+                    help="Load info for group abundance estimates from file or not"),
+        make_option("--grp_file", type="character",
+                    help="Info file for group abundance estimates"),
+        make_option("--groups", type="character", default="",
+                    help="Sample group information. Delimited by commas."),
 
         ## plot output
         make_option("--pattern_plot", type="logical", default=TRUE,
@@ -108,13 +113,15 @@ if(com_f){
       ## input files
       peak_file    = paste0(tool_dir,"test-data/xcms.tsv"),
       targ_file    = paste0(tool_dir,"test-data/xcms_tar.tsv"),
-      groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
-      ## peak_file    = paste0(tool_dir,"test-data/ecamam12.tsv"),
-      ## targ_file    = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
-      ## groups       = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       ## group abundance estimate
-      grp           = "TRUE",
+      grp          = "TRUE",
+      grp_file_sel = "no",
+      grp_file     = paste0(tool_dir,"test-data/xcms_grp.tsv"),
+      groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
+      ## peak_file = paste0(tool_dir,"test-data/ecamam12.tsv"),
+      ## targ_file = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
+      ## groups    = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       ## plot output
       pattern_plot  = TRUE,
@@ -210,11 +217,21 @@ WriteXLS(summ, ExcelFileName = opt$summary_file, row.names = T, FreezeRow = 1)
 
 ## Summary of grouped samples
 if (opt$grp) {
-  ## process group information
-  groups <- opt$groups
-  groups <- unlist(strsplit(groups,","))
-  groups <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
-  groups <- factor(groups)
+
+  ## get group info
+  if (opt$grp_file_sel == "yes") {
+    groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
+                         stringsAsFactors = F)
+    groups <- groups[,1,drop = TRUE]
+    ## wl-30-11-2018, Fri: group file must be one column without header. The 
+    ##  file extension can be tsv, csv or txt. sep="\t" takes no effect on one 
+    ##  column file.
+  } else {
+    groups <- opt$groups
+    groups <- unlist(strsplit(groups,","))
+    groups <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
+  }
+  groups <- as.factor(tolower(groups))
 
   summ_grp <- lapply(res_bat, function(x) group_labelling(x, groups = groups))
   WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T,

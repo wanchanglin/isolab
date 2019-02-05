@@ -3,6 +3,7 @@
     wl-12-04-2018, Thu: first working draft
     wl-13-04-2018, Fri: enter target information manually. The main 
        reference is galaxy tool 'masigpro'.
+    wl-05-02-2019, Tue: add load group file and help   
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -30,7 +31,13 @@
         ## Average estimate for groups
         --grp $grp.grp_selector
         #if $grp.grp_selector:
-          --groups $grp.groups
+          ## input group information directly or load a file?
+          --grp_file_sel $grp.grp_1.grp_file_sel 
+          #if $grp.grp_1.grp_file_sel=='yes':
+          --grp_file $grp.grp_1.grp_file
+          #else
+          --groups '$grp.grp_1.groups'
+          #end if
         #end if
 
         ## Plot results
@@ -198,10 +205,31 @@
                    the same group."/>
 
       <when value="TRUE">
-        <param name="groups" type="text" value=""
-               label="Specify group information"
-               help="A vector containing the name of the group of each sample
-                     analysed." />
+
+          <conditional name="grp_1">
+              <param name="grp_file_sel" type="select"
+                  label="Group information. Input from a file?" 
+                  help="You can load group from a file or enter below manually.">
+                  <option value="yes">Use group file</option>
+                  <option value="no">Enter group manually</option>
+              </param>
+
+              <when value="yes">
+                  <param name="grp_file" type="data"  format="txt" 
+                      label="Group file" 
+                      help="A data matrix containing only one column" />
+                  <!-- wl-30-11-2018, Fri: cannot use format="tabular". It does
+                  not treat one column data file as tabular format.  -->   
+              </when>
+              <when value="no">
+                  <param name="groups" type="text" value=""
+                      label="Specify group information"
+                      help="A vector containing the name of the group of each sample
+                            analysed. Delimited by a comma" />
+              </when>
+
+          </conditional>
+
       </when>
 
       <when value="FALSE">
@@ -260,9 +288,11 @@
   <!-- =============================================================== -->
   <tests>
     <test>
-      <param name="peak_file" value="xcms_obj.tsv" />
-      <param name="targ_file" value="targets.tsv" />
-      <param name="grp_selector" value="TURE" /> 
+      <param name="peak_file" value="xcms.tsv" />
+      <param name="targ_file" value="xcms_tar.tsv" />
+      <param name="grp" value="TURE" /> 
+      <param name="grp_file_sel" value="yes" /> 
+      <param name="grp_file" value="xcms_grp.tsv" /> 
       <param name="groups" value="C12,C12,C12,C12,C13,C13,C13,C13" /> 
       <param name="pattern_plot" value="TRUE" /> 
       <param name="residual_plot" value="TRUE" /> 
