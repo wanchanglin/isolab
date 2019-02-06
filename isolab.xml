@@ -377,9 +377,92 @@ name_compound     compound      charge   labelling   RT    RT_shift   chrom_widt
 [TAG_52_2+NH4]+   X55H106NO6    1        C           957   20         8             0.05          NA
 ===============   ===========   ======   =========   ===   ========   ===========   ==========    =================      
 
+Note that the target matrix can be enter manually. 
+
+**\3. Group matrix**
+
+If the user want to estimate the average of each sample group, the group
+information can be either enter manually or loaded from an one-column file.
+For example, the samples belong to two group: ``C12`` and ``C13``: 
+
+
+   +-----+
+   | C12 |
+   +-----+
+   | C12 |
+   +-----+
+   | C12 |
+   +-----+
+   | C12 |
+   +-----+
+   | C13 |
+   +-----+
+   | C13 |
+   +-----+
+   | C13 |
+   +-----+
+   | C13 |
+   +-----+
+
+  Note that this table does not includes any header.
 
 Parameters
 ----------
+
+Enter target
+~~~~~~~~~~~~
+
+The target matrix also can be enter manually. The user enters each item of a
+target. Repeat this procedure for multiple compounds. One option is provided
+for user to save these targets for future use. 
+
+To avoid man-made mistakes, this option should be restricted to few
+compounds. For more compounds to be analysed, the user should prepare it in
+a user-friend software such as Excel and save it as a ``.tsv`` file. And
+then load it into Galaxy. 
+
+Enter group
+~~~~~~~~~~~
+
+The group information can be input manually. Just type group item delimited
+by a comma. 
+
+Outputs
+----------
+
+Isotopic pattern analysis
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default output is the summary of isotopic pattern analysis for each
+compound. It can be download in ``xlsx`` format to view in Excel. 
+
+One example is:  
+
+==================  ============  ============  =============   =============
+Stats               C12_Sample_1  C12_Sample_2  C13_Sample_1    C13_Sample_2 
+==================  ============  ============  =============   =============
+Best Estimate [%]   1.0805687335  1.0703071648  98.9633146931   98.9543536508
+Standard Error [%]  0.0073567397  0.0073590531  0.007137333     0.0059831704
+==================  ============  ============  =============   =============
+
+Group estimate
+~~~~~~~~~~~~~~
+
+If user selects to performance group estimating, the result summary can be
+downloaded as an Excel ``XLSX`` file. It looks like for one compound:
+
+=====   ==  =============   ============  ============  =============  =============
+Group   N   Mean            SE mean       t_crit        Lower 95% CI   Upper 95% CI
+=====   ==  =============   ============  ============  =============  =============
+c12     4   1.0789361556    0.003001192   3.1824463053  1.0693850233   1.0884872879
+c13     4   98.9427703799   0.0045925496  3.1824463053  98.9281548374  98.9573859225
+=====   ==  =============   ============  ============  =============  =============
+
+Graphics output
+~~~~~~~~~~~~~~~
+
+All plots will be produced as PDF files if the user choose to do so,
+including isotopic patten analysis, its residuals and the group estimate. 
 
   </help>
 
