@@ -111,19 +111,19 @@
                      a single column of NA values can be entered" />
       </when>
 
-      <when value="no">
-        <param name="target_output" type="boolean" truevalue="1" falsevalue="0"
-               checked="true" label="Output generated targets input files?"
-               help="Choose if you want to output the generated targets." />
+     <when value="no">
+       <param name="target_output" type="boolean" truevalue="1" falsevalue="0"
+              checked="true" label="Output generated targets input files?"
+              help="Choose if you want to output the generated targets." />
 
         <repeat name="rep_target" title="Target" min="1" default="1">
 
           <param name="name_compound" type="text" value=""
                  label="Specify a compound name"
                  help="Letters, numbers and underscores will be allowed">
-            <!-- <sanitizer> -->
-            <!--   <valid initial="string.letters,string.digits"><add value="_" /></valid> -->
-            <!-- </sanitizer> -->
+            <sanitizer>
+              <valid initial="string.letters,string.digits"><add value="_" /></valid>
+            </sanitizer>
           </param>
 
           <param name="compound" type="text" value=""
@@ -189,12 +189,9 @@
           
         </repeat>
 
-
       </when>
       
     </conditional>
-    <!-- wl: end of <conditional name="target"> -->
-    
 
     <!-- =============================================================== -->
     <conditional name="grp">
@@ -205,31 +202,29 @@
                    the same group."/>
 
       <when value="TRUE">
+        <conditional name="grp_1">
+          <param name="grp_file_sel" type="select"
+                 label="Group information. Input from a file?" 
+                 help="You can load group from a file or enter below manually.">
+            <option value="yes">Use group file</option>
+            <option value="no">Enter group manually</option>
+          </param>
 
-          <conditional name="grp_1">
-              <param name="grp_file_sel" type="select"
-                  label="Group information. Input from a file?" 
-                  help="You can load group from a file or enter below manually.">
-                  <option value="yes">Use group file</option>
-                  <option value="no">Enter group manually</option>
-              </param>
-
-              <when value="yes">
-                  <param name="grp_file" type="data"  format="txt" 
-                      label="Group file" 
-                      help="A data matrix containing only one column" />
-                  <!-- wl-30-11-2018, Fri: cannot use format="tabular". It does
-                  not treat one column data file as tabular format.  -->   
-              </when>
-              <when value="no">
-                  <param name="groups" type="text" value=""
-                      label="Specify group information"
-                      help="A vector containing the name of the group of each sample
-                            analysed. Delimited by a comma" />
-              </when>
-
-          </conditional>
-
+          <when value="yes">
+            <param name="grp_file" type="data"  format="txt" 
+                   label="Group file" 
+                   help="A data matrix containing only one column" />
+                   <!-- wl-30-11-2018, Fri: cannot use format="tabular". It
+                     does not treat one column data file as tabular format.  
+                    -->   
+          </when>
+          <when value="no">
+            <param name="groups" type="text" value=""
+                   label="Specify group information"
+                   help="A vector containing the name of the group of each sample
+                         analysed. Delimited by a comma" />
+          </when>
+        </conditional>
       </when>
 
       <when value="FALSE">
