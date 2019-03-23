@@ -15,8 +15,8 @@ Rscript --vanilla ../isolab.R \
   --pattern_plot TRUE \
   --residual_plot TRUE \
   --result_plot TRUE \
-  --pattern_file "pattern.pdf" \
-  --residual_file "residual.pdf" \
-  --result_file "result.pdf" \
-  --summary_file "summary.xlsx" \
-  --summary_grp_file "summary_grp.xlsx"\
+  --pattern_file "../test-data/res/xcms_pattern.pdf" \
+  --residual_file "../test-data/res/xcms_residual.pdf" \
+  --result_file "../test-data/res/xcms_result.pdf" \
+  --summary_file "../test-data/res/xcms_summary.xlsx" \
+  --summary_grp_file "../test-data/res/xcms_summary_grp.xlsx"\

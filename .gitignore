@@ -1,6 +1,5 @@
 ## Folders to be ignored (only for galaxy tool)
 codes/
-res/
 doc/
 
 ## R History and session data files

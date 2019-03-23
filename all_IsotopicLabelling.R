@@ -1,9 +1,8 @@
-## ======================================================================
-## wl-24-02-2018, Sat: commence for debug and test. Notes: Use other R
-##   packages: xcms, ecipex, stringr, gsubfn
-## wl-08-05-2018, Tue: create an remote repository: https://github.com/wanchanglin/isolab 
-## ======================================================================
-
+#' wl-24-02-2018, Sat: commence for debug and test. Notes: Use other R
+#'   packages: xcms, ecipex, stringr, gsubfn
+#' wl-08-05-2018, Tue: create an remote repository: 
+#'   https://github.com/wanchanglin/isolab 
+#' wl-23-03-2019, Sat: apply 'styler' to re-format
 
 #' ========================================================================
 #' Main function of the package
@@ -86,22 +85,23 @@ main_labelling <- function(peak_table, compound, charge=1, labelling,
                            mass_shift, RT, RT_shift, chrom_width,
                            initial_abundance=NA){
 
-  ## Get some useful isotopic information, to be used in the coming
-  ## functions
+  #' Get some useful isotopic information, to be used in the coming
+  #' functions
   info <- isotopic_information(compound, charge, labelling)
 
-  ## Extract one pattern for each sample (each column of the peak_table data
-  ## frame)
+  #' Extract one pattern for each sample (each column of the peak_table data
+  #' frame)
   experimental_patterns <- isotopic_pattern(peak_table, info, mass_shift, 
                                             RT, RT_shift, chrom_width)
 
-  ## For each extracted pattern, find the X isotopic distribution that
-  ## better fits the experimental data
+  #' For each extracted pattern, find the X isotopic distribution that
+  #' better fits the experimental data
   fitted_abundances <- find_abundance(patterns=experimental_patterns, 
                                       info, initial_abundance, charge)
 
   return(fitted_abundances)
 }
+
 
 #' ========================================================================
 #' Get useful isotopic information
@@ -156,12 +156,12 @@ main_labelling <- function(peak_table, compound, charge=1, labelling,
 #' numbers of most chemical elements
 isotopic_information <- function(compound, charge=1, labelling){
 
-  ## Check that labelling is correct
+  #' Check that labelling is correct
   if (labelling !="H" & labelling !="C") 
     stop("Check the labelling character: it should be either H or C")
 
 
-  ## Introduce X in the isotopes data
+  #' Introduce X in the isotopes data
   isotopes <- nistiso[,1:3]  # wl-20-02-2018, Tue: global variable from `ecipex`
 
   X_new <- isotopes[which(isotopes$element==labelling),]
@@ -170,12 +170,12 @@ isotopic_information <- function(compound, charge=1, labelling){
   isotopes <- rbind(isotopes, X_new)
 
 
-  ## Compute the mass difference between heavier and lighter isotope
+  #' Compute the mass difference between heavier and lighter isotope
   mass_diff <- abs(diff(X_new[,"mass"]))/charge
 
 
-  ## In isotopes data frame keep only the elements of interest
-  DF <- strapply(compound,      ## wl-26-03-18: from package 'gsubfn'
+  #' In isotopes data frame keep only the elements of interest
+  DF <- strapply(compound,      #' wl-26-03-18: from package 'gsubfn'
                  "([A-Z][a-z]*)(\\d*)",
                  ~ c(..1, if (nchar(..2)) ..2 else 1),
                  simplify = ~ as.data.frame(t(matrix(..1, 2)), stringsAsFactors = FALSE))
@@ -185,7 +185,7 @@ isotopic_information <- function(compound, charge=1, labelling){
   isotopes <- isotopes[isotopes$element %in% DF[,1],]
 
 
-  ## Compute the exact mass of the species of interest (suppose that X has natural abundance)
+  #' Compute the exact mass of the species of interest (suppose that X has natural abundance)
   DF[[3]] <- apply(DF, 1, function(x){
     a <- which(x[1]==isotopes$element)
     a <- a[which.max(isotopes$abundance[a])]
@@ -195,11 +195,11 @@ isotopic_information <- function(compound, charge=1, labelling){
   exact_mass <- sum(DF[[2]]*DF[[3]])/charge
 
 
-  ## Set the X abundance to be unknown
+  #' Set the X abundance to be unknown
   isotopes$abundance[which(isotopes$element == "X")] <- NA
   row.names(isotopes) <- seq(nrow(isotopes))
 
-  ## Extract total number of atoms of the element being labelled
+  #' Extract total number of atoms of the element being labelled
   nTOT <- DF[which(DF[,1]==labelling),2]
   if (length(nTOT)==0) nTOT <- 0
 
@@ -209,11 +209,11 @@ isotopic_information <- function(compound, charge=1, labelling){
   nTOT <- nTOT + nX
 
 
-  ## Create the target vector, containing the exact masses of all the
-  ## possible isotopic variants arising from X
-  ## Lowest mass: 2 mass units below the monoisotopic mass
-  ## Highest mass: 2 mass units above the mass corresponding to all X atoms
-  ## having been labelled with the heaviest isotope
+  #' Create the target vector, containing the exact masses of all the
+  #' possible isotopic variants arising from X
+  #' Lowest mass: 2 mass units below the monoisotopic mass
+  #' Highest mass: 2 mass units above the mass corresponding to all X atoms
+  #' having been labelled with the heaviest isotope
 
   target <- round(seq(from=exact_mass-2*mass_diff, by=mass_diff, length=nX+5), 
                   digits=4)
@@ -273,7 +273,7 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
     return(data.frame(ind=ind, rt=peak_table[ind,"rt"]))
   })
 
-  ## Extract the retention times of all the peaks
+  #' Extract the retention times of all the peaks
   rt_overall <- sort(unique(unlist(lapply(tmp_list, function(x){x$rt}), use.names=F)))
   rt_grouped <- apply(abs(outer(rt_overall,rt_overall,'-')), 2, function(u) list(rt_overall[u<=chrom_width]))
   rt_grouped <- unique(lapply(rt_grouped, "[[", 1))
@@ -281,7 +281,7 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
   rt_candidates <- sapply(rt_grouped, mean)
   rt_best <- rt_candidates[which.min(abs(rt_candidates - RT))]
 
-  ## Define the matrix where to put the signals
+  #' Define the matrix where to put the signals
   patterns <- matrix(0, nrow=length(info$target), ncol=(ncol(peak_table)))
   row.names(patterns) <- names(info$target)
   colnames(patterns) <- colnames(peak_table)
@@ -298,9 +298,9 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
     }
   }
 
-  ## Check that the most intense signals do not come from M-2 or M-1 (which
-  ## could arise from the same species as the target, with one more
-  ## unsaturation) If so, "delete" the whole experimental pattern
+  #' Check that the most intense signals do not come from M-2 or M-1 (which
+  #' could arise from the same species as the target, with one more
+  #' unsaturation) If so, "delete" the whole experimental pattern
 
   if (ncol(patterns)>=3){
     max_pos <- apply(patterns[,-c(1,2)], 2, which.max)
@@ -309,18 +309,18 @@ isotopic_pattern <- function(peak_table, info, mass_shift, RT, RT_shift,
 
   patterns[is.na(patterns)] <- 0
 
-  ## Cut out the first two masses (M-2 and M-1)
+  #' Cut out the first two masses (M-2 and M-1)
   patterns <- patterns[-c(1,2),]
 
-  ## Check that each pattern has at least two signals different from 0, otherwise set all to 0
+  #' Check that each pattern has at least two signals different from 0, otherwise set all to 0
   ind_pat <- apply(patterns[,-c(1,2)], 2, function(c) sum(c!=0)) > 1
   patterns[,c(F,F,!ind_pat)] <- 0
 
-  ## Add the exact masses to the patterns matrix
+  #' Add the exact masses to the patterns matrix
   patterns[,"mz"] <- info$target[-c(1,2)]
   patterns[ which(patterns[,"rt"]==0), "rt"] <- NA
 
-  ## Return the obtained patterns
+  #' Return the obtained patterns
   return(patterns)
 
 }
@@ -377,13 +377,13 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
 
   tmp_results <- list()
   
-  ## ========================================================================
+  #' ========================================================================
   analysis_X <- function(pattern, info, initial_ab=NA, charge=1){
 
-    ## Create a vector of masses
+    #' Create a vector of masses
     target <- info$target[-c(1,2)]
 
-    ## Create the list to return in case of errors
+    #' Create the list to return in case of errors
     error_list <- list(compound      = info$compound,
                        best_estimate = NA,
                        std_error     = NA,
@@ -396,25 +396,25 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
 
     if (sum(pattern)==0) return(error_list)
 
-    ## Normalise the experimental pattern (max intensity = 100)
+    #' Normalise the experimental pattern (max intensity = 100)
     pattern <- pattern/max(pattern)*100
 
-    ## Find and store the mass of the most intense signal
+    #' Find and store the mass of the most intense signal
     mass_max <- target[which.max(pattern)]
 
-    ## First, rough estimate of the X abundance (either 2H or 13C), using
-    ## mass_max and the exact mass If the user inserts a first estimate
-    ## (initial_abundance), skip this step
+    #' First, rough estimate of the X abundance (either 2H or 13C), using
+    #' mass_max and the exact mass If the user inserts a first estimate
+    #' (initial_abundance), skip this step
     if (is.na(initial_ab)) 
       initial_ab <-  unname(round(((mass_max - target[1])*charge)/info$nX, digits=3))
     if (initial_ab <0) initial_ab <- 0
     if (initial_ab >1) initial_ab <- 1
 
-    ## Fitting procedure to find the best estimate for the X isotopic
-    ## abundance. The signals of the pattern are given weights proportional
-    ## to the square root of their intensity, so as to give less importance
-    ## to noise. Define a function of only one parameter, the abundance,
-    ## which will have to be fitted by the nls function
+    #' Fitting procedure to find the best estimate for the X isotopic
+    #' abundance. The signals of the pattern are given weights proportional
+    #' to the square root of their intensity, so as to give less importance
+    #' to noise. Define a function of only one parameter, the abundance,
+    #' which will have to be fitted by the nls function
 
     pattern_fit <- function(abundance) {
       pattern_from_abundance(abundance, info=info, charge=charge)
@@ -445,7 +445,7 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
   }
 
 
-  ## ========================================================================
+  #' ========================================================================
   for (i in 3:ncol(patterns)){
     tmp_results[[i-2]] <- analysis_X(pattern=patterns[,i], info=info,
                                      initial_ab=initial_abundance[i-2]/100,
@@ -453,7 +453,7 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
   }
   names(tmp_results) <- colnames(patterns[,-c(1,2)])
 
-  ## Create the output list from the results obtained
+  #' Create the output list from the results obtained
   best_estimate <- sapply(tmp_results, "[[", "best_estimate")
   std_error     <- sapply(tmp_results, "[[", "std_error")
   dev_percent   <- sapply(tmp_results, "[[", "dev_percent")
@@ -504,10 +504,10 @@ find_abundance <- function(patterns, info, initial_abundance=NA, charge=1){
 #'
 pattern_from_abundance <-function(abundance, info, charge=1){
 
-  ## Get the table containing isotopic information
+  #' Get the table containing isotopic information
   isotopes <- info$isotopes
 
-  ## Modify the isotopes table with the abundance specified by the user
+  #' Modify the isotopes table with the abundance specified by the user
   isotopes[which(isotopes$element=="X")[1],"abundance"] <- 1 - abundance
   isotopes[which(isotopes$element=="X")[2],"abundance"] <- abundance
 
@@ -517,17 +517,17 @@ pattern_from_abundance <-function(abundance, info, charge=1){
                                       id = FALSE,
                                       sortby = "mass")[[1]])
 
-  ## Correct masses for charge state
+  #' Correct masses for charge state
   theoret_pattern[,1] <- theoret_pattern[,1]/charge
 
 
-  ## Group together signals coming from isotopologues with the same nucleon
-  ## number, and assign them the proper position
+  #' Group together signals coming from isotopologues with the same nucleon
+  #' number, and assign them the proper position
   theoretical_pattern <- unlist(lapply(info$target[-c(1,2)], function(x){
     ind <- which(abs(x - theoret_pattern[,1]) <0.2/charge)
     return(sum(theoret_pattern[ind,2]))
   }))
-  ## Normalise the theoretical pattern
+  #' Normalise the theoretical pattern
   theoretical_pattern <- theoretical_pattern/max(theoretical_pattern)*100
 
   return(theoretical_pattern)
@@ -589,10 +589,10 @@ batch_labelling <- function(peak_table, targets, groups, plot_patterns=T,
                             plot_residuals=F, plot_results=F, 
                             save_results=F){
 
-  ## attach targets data frame
+  #' attach targets data frame
   attach(targets)
 
-  ## Batch process
+  #' Batch process
   batch_grouped_estimates <- list()
 
   for (i in 1:length(compound)){
@@ -605,16 +605,16 @@ batch_labelling <- function(peak_table, targets, groups, plot_patterns=T,
                                    RT_shift=RT_shift[i],
                                    chrom_width=chrom_width[i],
                                    initial_abundance=as.numeric(targets[i,8:ncol(targets)]))
-    ## plot the patterns
+    #' plot the patterns
     if (plot_patterns) plot(x=batch_fitted, type="patterns", saveplots=T)
-    ## plot the residuals
+    #' plot the residuals
     if (plot_residuals) plot(x=batch_fitted, type="residuals", saveplots=T)
-    ## plot the overall results
+    #' plot the overall results
     if (plot_results) plot(x=batch_fitted, type="summary", saveplots=T)
-    ## save the results to a *.csv file
+    #' save the results to a *.csv file
     if (save_results) save_labelling(batch_fitted)
 
-    ## Group the samples and obtain grouped estimates
+    #' Group the samples and obtain grouped estimates
     batch_grouped_estimates[[i]] <- group_labelling(batch_fitted, groups=groups)
   }
   names(batch_grouped_estimates) <- name_compound
@@ -667,12 +667,12 @@ batch_labelling <- function(peak_table, targets, groups, plot_patterns=T,
 #'
 group_labelling <- function(fitted_abundances, groups){
 
-  ## Extract the estimated percentage abundances and the std errors of the
-  ## fit
+  #' Extract the estimated percentage abundances and the std errors of the
+  #' fit
   estimates   <- fitted_abundances$best_estimate
   std_err_fit <- fitted_abundances$std_error
 
-  ## Remove NA's from the data
+  #' Remove NA's from the data
   ind_NA <- which(is.na(estimates) | is.na(std_err_fit))
 
   if (length(ind_NA) !=0) {
@@ -681,35 +681,36 @@ group_labelling <- function(fitted_abundances, groups){
     groups      <- groups[-ind_NA]
   }
 
-  ## Compute the average for each group
+  #' Compute the average for each group
   avg <- tapply(estimates, groups, mean)
 
-  ## Compute the variance due to biological variability
+  #' Compute the variance due to biological variability
   var_biol <- tapply(estimates, groups, var)
 
-  ## Compute the variance due to single-sample errors
+  #' Compute the variance due to single-sample errors
   var_within <- tapply(std_err_fit, groups,
                        function(x){1/length(x)*sum(x^2)})
 
-  ## Compute the total variance
+  #' Compute the total variance
   var_TOT <- var_biol + var_within
 
-  ## Compute the std error of the MEAN
+  #' Compute the std error of the MEAN
   N        <- tapply(groups,groups,length)
   std_MEAN <- sqrt( var_TOT / N )
 
-  ## Compute the 95% Confidence intervals
+  #' Compute the 95% Confidence intervals
   width <- tapply(groups, groups, function(x){ qt(.975, df=length(x)-1) })
   Lower <- avg - width*std_MEAN
   Upper <- avg + width*std_MEAN
 
-  ## Provide the output
+  #' Provide the output
   grouped_estimates <- data.frame(N, avg, std_MEAN, width, Lower, Upper);
   names(grouped_estimates) <- c("N", "Mean", "SE mean", "t_crit", 
                                 "Lower 95% CI", "Upper 95% CI")
 
   return(grouped_estimates)
 }
+
 
 #' ========================================================================
 #' Plot method for \code{labelling} objects
@@ -742,7 +743,6 @@ group_labelling <- function(fitted_abundances, groups){
 #'
 #' @author Ruggero Ferrazza
 #' @keywords hplot
-
 plot.labelling <- function(x, type="patterns", saveplots=F, ...){
   fitted_abundances <- x
   plot.new()
@@ -751,7 +751,7 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
   sample_name <- names(fitted_abundances$best_estimate)
 
   if (type=="patterns"){
-    ## Plot the results
+    #' Plot the results
     if (saveplots==T) {
       pdf(paste(fitted_abundances$compound, "_Isotopic_Patterns", ".pdf", sep=""), width=6.5, height=3)
       par(mar=c(3,3,2.5,0.1), mgp=c(2,0.6,0))
@@ -768,7 +768,7 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
       mtext(text, cex=0.8)
 
       points(fitted_abundances$x_scale, fitted_abundances$y_theor[,k], 
-             col=2, pch=16, cex=.5)  ## col="red"
+             col=2, pch=16, cex=.5)  #' col="red"
       points(fitted_abundances$x_scale[1], -2.5, pch=17, col="blue")
 
       legend("top", legend=c("Experimental pattern", "Theoretical pattern"), 
@@ -776,7 +776,7 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
              horiz=TRUE)
     }
   } else if (type=="residuals") {
-    ## Plot the residuals
+    #' Plot the residuals
 
     if (saveplots==T) {
       pdf(paste(fitted_abundances$compound, "_Residuals", ".pdf", sep=""), width=6.5, height=3)
@@ -818,6 +818,7 @@ plot.labelling <- function(x, type="patterns", saveplots=F, ...){
 
   if (saveplots==T) dev.off() else par(old.par)
 }
+
 
 #' ========================================================================
 #' Export to csv
@@ -927,7 +928,7 @@ summary.labelling <- function(object, ...){
 #' -----------------------------------------------------------------------
 table_xcms <- function(xcms_obj){
 
-  ## Check that the file in input is an xcmsSet object
+  #' Check that the file in input is an xcmsSet object
   if (class(xcms_obj) != "xcmsSet") 
     stop("ERROR: The provided object is not an xcmsSet object")
 
@@ -949,7 +950,8 @@ table_xcms <- function(xcms_obj){
 #' @author Ruggero Ferrazza
 #' @examples
 #' data(targets)
-## "targets"
+#' "targets"
+
 
 #' ======================================================================
 #' @title Example data set
@@ -965,7 +967,7 @@ table_xcms <- function(xcms_obj){
 #' @author Dr. Julian L Griffin and Dr. Nyasha Munjoma
 #' @examples
 #' data("xcms_obj")
-## "xcms_obj"
+#' "xcms_obj"
 
 
 #' ========================================================================
@@ -1037,7 +1039,7 @@ plot.func <- function(x, type="patterns", ...){
       text=paste("Fitted X Abundance: (", sprintf("%1.3f", x$best_estimate[k]), "+/-", sprintf("%1.3f", x$std_error[k]), ")\ %")
       mtext(text, cex=0.8)
       points(x$x_scale, x$y_theor[,k], 
-             col=2, pch=16, cex=.5)  ## col="red"
+             col=2, pch=16, cex=.5)  #' col="red"
       points(x$x_scale[1], -2.5, pch=17, col="blue")
       legend("top", legend=c("Experimental pattern", "Theoretical pattern"), 
              lty=c(1,0), pch=c(0,16), pt.cex=c(0,0.6), col=c(1,2), cex=0.7, 
