@@ -1,6 +1,7 @@
 #!/bin/bash
 # wl-11-04-2018, Wed: Rscript test code
-
+# wl-24-03-2019, Sun: change 'yes' or 'no' for --grp_file_sel
+ 
   # --peak_file "../test-data/ecamam12.tsv" \
   # --targ_file "../test-data/ecamam12_tar.tsv" \
   # --groups  "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu" \

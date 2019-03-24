@@ -7,6 +7,9 @@
 #' wl-22-05-2018, Tue: test new group
 #' wl-05-02-2019, Tue: load group info from file
 #' wl-23-03-2019, Sat: tidy up and use Vim's folding as outline view
+#' wl-24-03-2019, Sun: apply planemo test and xlsx file, prodecuded by
+#'   'WriteXLS' in local is fine. So drop R package 'writexl' which cannot
+#'    output row names of data frame.
 
 ## ==== General settings ====
 
@@ -31,8 +34,7 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(writexl)
-  #' library(WriteXLS)
+  library(WriteXLS)
   library(ecipex)
   library(gsubfn)        #' Only for function strapply
 })
@@ -98,10 +100,10 @@ if(com_f){
                     help="Save result plot"),
 
         #' Excel files
-        make_option("--summary_file",type="character",default="summary.xls",
+        make_option("--summary_file",type="character",default="summary.xlsx",
                     help="Save summary results in Excel"),
         make_option("--summary_grp_file",type="character",
-                    default="summary_grp.xls",
+                    default="summary_grp.xlsx",
                     help="Save group summary results")
     )
 
@@ -216,8 +218,7 @@ if (opt$result_plot) {
 
 #' Summary of individual sample
 summ  <- lapply(res_bat, function(x) as.data.frame(summary(x)))
-write_xlsx(summ, path = opt$summary_file, col_names = T, format_headers = T)
-#' WriteXLS(summ, ExcelFileName = opt$summary_file, row.names = T, FreezeRow = 1)
+WriteXLS(summ, ExcelFileName = opt$summary_file, row.names = T, FreezeRow = 1)
 
 #' Summary of grouped samples
 if (opt$grp) {
@@ -237,8 +238,7 @@ if (opt$grp) {
   groups <- as.factor(tolower(groups))
 
   summ_grp <- lapply(res_bat, function(x) group_labelling(x, groups = groups))
-  write_xlsx(summ_grp, path = opt$summary_grp_file, col_names = T, format_headers = T)
-  #' WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T, FreezeRow = 1)
+  WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T, FreezeRow = 1)
 }
 
 ## ==== DEBUG: Step-by-step codes ====

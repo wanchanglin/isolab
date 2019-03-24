@@ -43,8 +43,7 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 
 ## To-Do ##
 
-- Dependencies will be handled by CONDA. This includes all R packages used.
-
+- R package `ecipex` is not in BIOCONDA. (24-03-2019, Sun)
 - White spaces in 'groups' input: Group factor delimiter is comma. No any
   extra white spaces are allowed otherwise an error will be encountered.
   Note that 'isolab.sh' has no problem with white spaces. Probably it is

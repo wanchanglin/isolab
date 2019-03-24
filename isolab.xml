@@ -1,15 +1,21 @@
 <!--
-    wl-11-04-2018, wed: commence
-    wl-12-04-2018, Thu: first working draft
-    wl-13-04-2018, Fri: enter target information manually. The main 
-       reference is galaxy tool 'masigpro'.
-    wl-05-02-2019, Tue: add load group file and help   
+  wl-11-04-2018, wed: commence
+  wl-12-04-2018, Thu: first working draft
+  wl-13-04-2018, Fri: enter target information manually. The main 
+     reference is galaxy tool 'masigpro'.
+  wl-05-02-2019, Tue: add load group file and help   
+  wl-24-03-2019, Sun: R package 'ecipex' is not in bioconda
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
   <description>
     Mass Spectrometric Isotopic Labelling
   </description>
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <!-- <expand macro="requirements" /> -->
+  <expand macro="stdio" />
   
   <!-- =============================================================== -->
   <command>
@@ -288,15 +294,29 @@
       <param name="grp" value="TURE" /> 
       <param name="grp_file_sel" value="yes" /> 
       <param name="grp_file" value="xcms_grp.tsv" /> 
+      <param name="pattern_plot" value="TRUE" /> 
+      <param name="residual_plot" value="TRUE" /> 
+      <param name="result_plot" value="TRUE" /> 
+      <output name="pattern_file" file="res/xcms_pattern.pdf" compare="sim_size"/>
+      <output name="residual_file" file="res/xcms_residual.pdf" compare="sim_size"/>
+      <output name="result_file" file="res/xcms_result.pdf" compare="sim_size"/>
+      <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size"/>
+      <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size"/>
+    </test>
+    <test>
+      <param name="peak_file" value="xcms.tsv" />
+      <param name="targ_file" value="xcms_tar.tsv" />
+      <param name="grp" value="TURE" /> 
+      <param name="grp_file_sel" value="no" /> 
       <param name="groups" value="C12,C12,C12,C12,C13,C13,C13,C13" /> 
       <param name="pattern_plot" value="TRUE" /> 
       <param name="residual_plot" value="TRUE" /> 
       <param name="result_plot" value="TRUE" /> 
-      <output name="pattern_file" file="pattern.pdf" />
-      <output name="residual_file" file="residual.pdf" />
-      <output name="result_file" file="result.pdf" />
-      <output name="summary_file" file="summary.xlsx" />
-      <output name="summary_grp_file" file="summary_grp.xlsx" />
+      <output name="pattern_file" file="res/xcms_pattern.pdf" compare="sim_size"/>
+      <output name="residual_file" file="res/xcms_residual.pdf" compare="sim_size"/>
+      <output name="result_file" file="res/xcms_result.pdf" compare="sim_size"/>
+      <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size"/>
+      <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size"/>
     </test>
   </tests>
 
@@ -460,5 +480,8 @@ All plots will be produced as PDF files if the user choose to do so,
 including isotopic patten analysis, its residuals and the group estimate. 
 
   </help>
+  <citations>
+    <citation type="doi">10.1093/bioinformatics/btw588</citation>
+  </citations>
 
 </tool>
