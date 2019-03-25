@@ -2,7 +2,7 @@
   <xml name="requirements">
     <requirements>
       <requirement type="package">r-optparse</requirement>
-      <requirement type="package">r-writexls</requirement>
+      <requirement type="package" version="4.1.0">r-writexls</requirement>
       <requirement type="package">r-gsubfn</requirement>
       <requirement type="package">r-ecipex</requirement>
       <!-- <requirement type="package">bioconductor-xcms</requirement> -->
