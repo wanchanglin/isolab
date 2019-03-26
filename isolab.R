@@ -35,7 +35,7 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 suppressPackageStartupMessages({
   library(optparse)
   library(WriteXLS)
-  library(ecipex)
+  #' library(ecipex)
   library(gsubfn)        #' Only for function strapply
 })
 
@@ -146,8 +146,11 @@ if(com_f){
 }
 
 suppressPackageStartupMessages({
-  source(paste0(tool_dir,"all_IsotopicLabelling.R"))
+  source(paste0(tool_dir,"pkgs/all_IsotopicLabelling.R"))
+  source(paste0(tool_dir,"pkgs/all_ecipex.R"))
+  load(paste0(tool_dir,"pkgs/nistiso.rda"))
 })
+
 
 ## ==== 1) Data preparation ====
 

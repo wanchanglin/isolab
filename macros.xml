@@ -4,7 +4,8 @@
       <requirement type="package">r-optparse</requirement>
       <requirement type="package" version="4.1.0">r-writexls</requirement>
       <requirement type="package">r-gsubfn</requirement>
-      <requirement type="package">r-ecipex</requirement>
+        <!-- wl-26-03-2019, Tue; no r-ecipex in any conda repositories -->
+      <!-- <requirement type="package">r-ecipex</requirement> -->
       <!-- <requirement type="package">bioconductor-xcms</requirement> -->
     </requirements>
   </xml>
