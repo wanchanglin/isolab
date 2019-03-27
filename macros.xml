@@ -6,7 +6,6 @@
       <requirement type="package">r-gsubfn</requirement>
         <!-- wl-26-03-2019, Tue; no r-ecipex in any conda repositories -->
       <!-- <requirement type="package">r-ecipex</requirement> -->
-      <!-- <requirement type="package">bioconductor-xcms</requirement> -->
     </requirements>
   </xml>
   <xml name="stdio">

@@ -1,8 +1,7 @@
 
-
 #' ======================================================================
 #' wl-26-03-2019, Tue: taken from R package 'ecipex'. This is the only 
-#'  function in the package.
+#'  function in the package. https://cran.r-project.org/package=ecipex
 ecipex <- function(formulas, isoinfo = nistiso, limit = 1e-12, id = FALSE, sortby = "abundance") {
   sortby <- match.arg(sortby, c("abundance", "mass"))
 
@@ -215,6 +214,7 @@ ecipex <- function(formulas, isoinfo = nistiso, limit = 1e-12, id = FALSE, sortb
 
 #' ======================================================================
 #' wl-26-03-2019, Tue: From function 'makeup.R' of R package 'CHNOSZ'
+#' https://cran.r-project.org/package=CHNOSZ
 count.elements <- function(formula) {
   # count the elements in a chemical formula   20120111 jmd
   # this function expects a simple formula,

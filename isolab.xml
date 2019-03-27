@@ -4,7 +4,7 @@
   wl-13-04-2018, Fri: enter target information manually. The main 
      reference is galaxy tool 'masigpro'.
   wl-05-02-2019, Tue: add load group file and help   
-  wl-24-03-2019, Sun: R package 'ecipex' is not in bioconda
+  wl-24-03-2019, Sun: R package 'ecipex' is not in bioconda and conda-forge
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -317,6 +317,21 @@
       <output name="result_file" file="res/xcms_result.pdf" compare="sim_size"/>
       <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size"/>
       <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size"/>
+    </test>
+    <test>
+      <param name="peak_file" value="ecamam12.tsv" />
+      <param name="targ_file" value="ecamam12_tar.tsv" />
+      <param name="grp" value="TURE" /> 
+      <param name="grp_file_sel" value="yes" /> 
+      <param name="grp_file" value="ecamam12_grp.tsv" /> 
+      <param name="pattern_plot" value="TRUE" /> 
+      <param name="residual_plot" value="TRUE" /> 
+      <param name="result_plot" value="TRUE" /> 
+      <output name="pattern_file" file="res/ecamam12_pattern.pdf" compare="sim_size"/>
+      <output name="residual_file" file="res/ecamam12_residual.pdf" compare="sim_size"/>
+      <output name="result_file" file="res/ecamam12_result.pdf" compare="sim_size"/>
+      <output name="summary_file" file="res/ecamam12_summary.xlsx" compare="sim_size"/>
+      <output name="summary_grp_file" file="res/ecamam12_summary_grp.xlsx" compare="sim_size"/>
     </test>
   </tests>
 

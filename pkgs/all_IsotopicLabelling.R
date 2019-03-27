@@ -1,8 +1,11 @@
-#' wl-24-02-2018, Sat: commence for debug and test. Notes: Use other R
-#'   packages: xcms, ecipex, stringr, gsubfn
+#' wl-24-02-2018, Sat: from https://github.com/RuggeroFerrazza/IsotopicLabelling
+#' wl-25-02-2018, Sun: commence for debug and test. Notes: Use other R
+#'   packages: ecipex, gsubfn, xcms and stringr
 #' wl-08-05-2018, Tue: create an remote repository: 
 #'   https://github.com/wanchanglin/isolab 
 #' wl-23-03-2019, Sat: apply 'styler' to re-format
+#' wl-27-03-2019, Wed: call 'ecipex' directly
+
 
 #' ========================================================================
 #' Main function of the package
