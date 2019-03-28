@@ -10,8 +10,10 @@ analytes](https://academic.oup.com/bioinformatics/article/33/2/300/2525697).
 
 ## Installation ##
 
-You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
-[conda](https://docs.conda.io/en/latest/miniconda.html) under linux.
+- Install [Galaxy](https://github.com/galaxyproject/galaxy) under Linux.
+
+- Install [conda](https://docs.conda.io/en/latest/miniconda.html) under
+  Linux. `conda` is used to install `requirements` of this tool. 
 
 - Use `git` to clone this tool
 
@@ -39,8 +41,11 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
   ```
 
 - The Galaxy tool uses [R](https://cran.r-project.org/) packages `optparse`,
-  `WriteXLS` and `gsubfn`.  Two R packages `IsotopicLabelling` and `ecipes`
-  are already included.
+  `WriteXLS` and `gsubfn`.  All of these packages will be installed by
+  `conda` in its virtual environment. Two R packages `IsotopicLabelling` and
+  `ecipes` are already included.
+
+- Some test data are located in `test-data`.
 
 ## Notes ##
 
@@ -49,7 +54,7 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 - White spaces in `groups` input: Group factor delimiter is comma. No any
   extra white spaces are allowed otherwise an error will be encountered.
   Note that `isolab.sh` has no problem with white spaces. Probably it is
-  'Cheetah' or Galaxy's text input problem.(31-05-2018, Thu) 
+  'Cheetah' or Galaxy's text input problem. (31-05-2018, Thu) 
 
 ## Authors, contributors & contacts ##
 
