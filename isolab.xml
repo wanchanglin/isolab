@@ -5,6 +5,8 @@
      reference is galaxy tool 'masigpro'.
   wl-05-02-2019, Tue: add load group file and help   
   wl-24-03-2019, Sun: R package 'ecipex' is not in bioconda and conda-forge
+  wl-02-04-2019, Tue: add more tests and use 'sed' to remove the first and 
+   bottom lines of '$target_matrix'. Note that sed's '$' need to escape.
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -21,6 +23,7 @@
   <command>
     <![CDATA[
       #if str($target.target_selector) == "no":
+          sed -i '1d;\$d' '$target_matrix' &&
           #if $target.target_output:
               ln -f $target_matrix $target_out &&
           #end if
@@ -38,9 +41,9 @@
         --grp $grp.grp_selector
         #if $grp.grp_selector:
           ## input group information directly or load a file?
-          --grp_file_sel $grp.grp_1.grp_file_sel 
+          --grp_file_sel '$grp.grp_1.grp_file_sel' 
           #if $grp.grp_1.grp_file_sel=='yes':
-          --grp_file $grp.grp_1.grp_file
+          --grp_file '$grp.grp_1.grp_file'
           #else
           --groups '$grp.grp_1.groups'
           #end if
@@ -127,8 +130,13 @@
           <param name="name_compound" type="text" value=""
                  label="Specify a compound name"
                  help="Letters, numbers and underscores will be allowed">
-            <sanitizer>
-              <valid initial="string.letters,string.digits"><add value="_" /></valid>
+            <sanitizer invalid_char="">
+              <valid initial="string.ascii_letters,string.digits">
+                <add value="_" />
+                <add value="+" />
+                <add value="[" />
+                <add value="]" />
+              </valid>
             </sanitizer>
           </param>
 
@@ -136,7 +144,7 @@
                  label="Specify a compound"
                  help="Letters and numbers will be allowed">
             <sanitizer>
-              <valid initial="string.letters,string.digits"></valid>
+              <valid initial="string.ascii_letters,string.digits"></valid>
             </sanitizer>
           </param>
           
@@ -152,7 +160,7 @@
                  label="Specify a labelling isotope"
                  help="Letters will be allowed">
             <sanitizer>
-              <valid initial="string.letters"></valid>
+              <valid initial="string.ascii_letters"></valid>
             </sanitizer>
           </param>
           
@@ -183,13 +191,18 @@
           <param name="mass_shift" type="float" value="0.05"
                  label="Specify a mass shift"
                  help="Only numbers will be allowed">
+            <sanitizer invalid_char="">
+              <valid initial="string.digits">
+                <add value="." />
+              </valid>
+            </sanitizer>
           </param>
 
           <param name="initial_abundance" type="text" value="NA"
                  label="Specify an initial abundance"
                  help="Letters and numbers will be allowed">
             <sanitizer>
-              <valid initial="string.letters,string.digits"></valid>
+              <valid initial="string.ascii_letters,string.digits"></valid>
             </sanitizer>
           </param>
           
@@ -288,6 +301,62 @@
 
   <!-- =============================================================== -->
   <tests>
+    <!-- test for manually target input. compare with 'isolab_1.sh' except
+         'xcms_tar_res.tsv' which is not output from R.
+      -->  
+    <test>
+      <param name="peak_file" value="xcms.tsv" />
+      <conditional name="target">
+        <param name="target_selector" value="no" />
+        <repeat name="rep_target">
+          <param name="name_compound"     value="[PC_32_2+H]+" />
+          <param name="compound"          value="X40H77NO8P"   />
+          <param name="charge"            value="1" />
+          <param name="labelling"         value="C" />
+          <param name="RT"                value="285" />
+          <param name="RT_shift"          value="20" />
+          <param name="chrom_width"       value="7" />
+          <param name="mass_shift"        value="0.05" />
+          <param name="initial_abundance" value="NA" />
+        </repeat>
+        <repeat name="rep_target">
+          <param name="name_compound"     value="[PC_32_1+H]+" />
+          <param name="compound"          value="X40H79NO8P"   />
+          <param name="charge"            value="1" />
+          <param name="labelling"         value="C" />
+          <param name="RT"                value="360" />
+          <param name="RT_shift"          value="20" />
+          <param name="chrom_width"       value="10" />
+          <param name="mass_shift"        value="0.05" />
+          <param name="initial_abundance" value="NA" />
+        </repeat>
+        <repeat name="rep_target">
+          <param name="name_compound"     value="[PC_32_2+H]+" />
+          <param name="compound"          value="X42H81NO8P"   />
+          <param name="charge"            value="1" />
+          <param name="labelling"         value="C" />
+          <param name="RT"                value="370" />
+          <param name="RT_shift"          value="20" />
+          <param name="chrom_width"       value="13" />
+          <param name="mass_shift"        value="0.05" />
+          <param name="initial_abundance" value="NA" />
+        </repeat>
+      </conditional>
+      <param name="grp" value="TURE" /> 
+      <param name="grp_file_sel" value="yes" /> 
+      <param name="grp_file" value="xcms_grp.tsv" /> 
+      <param name="pattern_plot" value="TRUE" /> 
+      <param name="residual_plot" value="TRUE" /> 
+      <param name="result_plot" value="TRUE" /> 
+      <output name="pattern_file" file="res/xcms_pattern_1.pdf" compare="sim_size"/>
+      <output name="residual_file" file="res/xcms_residual_1.pdf" compare="sim_size"/>
+      <output name="result_file" file="res/xcms_result_1.pdf" compare="sim_size"/>
+      <output name="summary_file" file="res/xcms_summary_1.xlsx" compare="sim_size"/>
+      <output name="summary_grp_file" file="res/xcms_summary_grp_1.xlsx" compare="sim_size"/>
+      <!-- The following is not from R script, but from cheetah -->  
+      <output name="target_out" file="res/xcms_tar_res.tsv" />
+    </test>
+    <!-- test the target file and group file -->
     <test>
       <param name="peak_file" value="xcms.tsv" />
       <param name="targ_file" value="xcms_tar.tsv" />
@@ -303,6 +372,7 @@
       <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size"/>
       <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size"/>
     </test>
+    <!-- test the target file and group input manually -->
     <test>
       <param name="peak_file" value="xcms.tsv" />
       <param name="targ_file" value="xcms_tar.tsv" />
@@ -318,6 +388,7 @@
       <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size"/>
       <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size"/>
     </test>
+    <!-- test the another data set -->
     <test>
       <param name="peak_file" value="ecamam12.tsv" />
       <param name="targ_file" value="ecamam12_tar.tsv" />
