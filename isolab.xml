@@ -351,8 +351,8 @@
       <output name="pattern_file" file="res/xcms_pattern_1.pdf" compare="sim_size" delta="50000"/>
       <output name="residual_file" file="res/xcms_residual_1.pdf" compare="sim_size" delta="50000"/>
       <output name="result_file" file="res/xcms_result_1.pdf" compare="sim_size" delta="50000"/>
-      <!-- <output name="summary_file" file="res/xcms_summary_1.xlsx" compare="sim_size" delta="50000"/> -->
-      <!-- <output name="summary_grp_file" file="res/xcms_summary_grp_1.xlsx" compare="sim_size" delta="50000"/> -->
+      <output name="summary_file" file="res/xcms_summary_1.xlsx" compare="sim_size" delta="50000"/>
+      <output name="summary_grp_file" file="res/xcms_summary_grp_1.xlsx" compare="sim_size" delta="50000"/>
       <!-- The following is not from R script, but from cheetah -->  
       <output name="target_out" file="res/xcms_tar_res.tsv" />
     </test>
