@@ -372,7 +372,7 @@
       <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size" delta="50000"/>
     </test>
 
-    <!-- test the target file and group file
+    <!-- test the target file and group file -->
     <test>
       <param name="peak_file" value="xcms.tsv" />
       <param name="targ_file" value="xcms_tar.tsv" />
@@ -404,7 +404,7 @@
       <output name="summary_file" file="res/ecamam12_summary.xlsx" compare="sim_size" delta="50000"/>
       <output name="summary_grp_file" file="res/ecamam12_summary_grp.xlsx" compare="sim_size" delta="50000"/>
     </test>
-    -->
+    
   </tests>
 
   <!-- =============================================================== -->
