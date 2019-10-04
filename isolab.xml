@@ -39,7 +39,7 @@
         
         ## Average estimate for groups
         --grp $grp.grp_selector
-        #if $grp.grp_selector:
+        #if $grp.grp_selector =="TRUE":
           ## input group information directly or load a file?
           --grp_file_sel '$grp.grp_1.grp_file_sel' 
           #if $grp.grp_1.grp_file_sel=='yes':
@@ -67,7 +67,7 @@
 
         ## Output Excel files
         --summary_file $summary_file 
-        #if $grp.grp_selector:
+        #if $grp.grp_selector =="TRUE":
            --summary_grp_file $summary_grp_file
         #end if
 
@@ -215,10 +215,13 @@
     <!-- =============================================================== -->
     <conditional name="grp">
       <param name="grp_selector"
-             type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
+             type="select"
              label="Average estimate within groups" 
              help="Calculate summary statistics for the samples belonging to 
-                   the same group."/>
+                   the same group.">
+                <option value="TRUE" selected="True">Average within groups</option>
+                <option value="FALSE">Do not average within groups</option>
+      </param>
 
       <when value="TRUE">
         <conditional name="grp_1">
@@ -294,7 +297,7 @@
           label="Result summary on ${on_string}"/>
     <data format="xlsx" name="summary_grp_file" 
           label="Group result summary on ${on_string}" >
-      <filter> grp['grp_selector'] == True </filter>
+      <filter> grp['grp_selector'] == "TRUE" </filter>
     </data>
     
   </outputs>
@@ -481,7 +484,8 @@ name_compound     compound      charge   labelling   RT    RT_shift   chrom_widt
 
 |
 
-Note that the target matrix can be enter manually. 
+Note that the target matrix can be entered manually. For examples of positive 
+and negative mode, see https://github.com/wanchanglin/dimsp/tree/master/test-data/LipidList_generator.
 
 
 **\3. Group matrix**
