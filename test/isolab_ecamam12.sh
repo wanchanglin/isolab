@@ -14,5 +14,5 @@ Rscript --vanilla ../isolab.R \
   --pattern_file "../test-data/res/ecamam12_pattern.pdf" \
   --residual_file "../test-data/res/ecamam12_residual.pdf" \
   --result_file "../test-data/res/ecamam12_result.pdf" \
-  --summary_file "../test-data/res/ecamam12_summary.xlsx" \
-  --summary_grp_file "../test-data/res/ecamam12_summary_grp.xlsx"\
+  --summary_file "../test-data/res/ecamam12_summary.tsv" \
+  --summary_grp_file "../test-data/res/ecamam12_summary_grp.tsv"\

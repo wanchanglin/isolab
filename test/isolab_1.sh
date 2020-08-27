@@ -14,5 +14,5 @@ Rscript --vanilla ../isolab.R \
   --pattern_file "../test-data/res/xcms_pattern_1.pdf" \
   --residual_file "../test-data/res/xcms_residual_1.pdf" \
   --result_file "../test-data/res/xcms_result_1.pdf" \
-  --summary_file "../test-data/res/xcms_summary_1.xlsx" \
-  --summary_grp_file "../test-data/res/xcms_summary_grp_1.xlsx"\
+  --summary_file "../test-data/res/xcms_summary_1.tsv" \
+  --summary_grp_file "../test-data/res/xcms_summary_grp_1.tsv"\

@@ -1,11 +1,8 @@
 <macros>
   <xml name="requirements">
     <requirements>
-      <requirement type="package" version="1.6.4">r-optparse</requirement>
-      <requirement type="package" version="5.0.0">r-writexls</requirement>
+      <requirement type="package" version="1.6.6">r-optparse</requirement>
       <requirement type="package" version="0.7">r-gsubfn</requirement>
-        <!-- wl-26-03-2019, Tue; no r-ecipex in any conda repositories -->
-      <!-- <requirement type="package">r-ecipex</requirement> -->
     </requirements>
   </xml>
   <xml name="stdio">

@@ -7,6 +7,7 @@
   wl-24-03-2019, Sun: R package 'ecipex' is not in bioconda and conda-forge
   wl-02-04-2019, Tue: add more tests and use 'sed' to remove the first and 
    bottom lines of '$target_matrix'. Note that sed's '$' need to escape.
+  wl-27-08-2020, Thu: Review. change xslx to tabular format
 -->
 
 <tool id="isolab" name="IsotopicLabelling" version="0.1.0">
@@ -68,7 +69,7 @@
           --result_file '$result_file'
         #end if
 
-        ## Output Excel files
+        ## Output tabular files
         --summary_file '$summary_file' 
         #if $grp.grp_selector =="TRUE":
            --summary_grp_file '$summary_grp_file'
@@ -296,10 +297,10 @@
           label="Result summary plot on ${on_string}">
       <filter> result_plot == True </filter>
     </data>
-    <data format="xlsx" name="summary_file" 
+    <data format="tabular" name="summary_file" 
           label="Result summary on ${on_string}"/>
-    <data format="xlsx" name="summary_grp_file" 
-          label="Group result summary on ${on_string}" >
+    <data format="tabular" name="summary_grp_file" 
+          label="Group summary result on ${on_string}" >
       <filter> grp['grp_selector'] == "TRUE" </filter>
     </data>
     
@@ -357,11 +358,12 @@
       <output name="pattern_file" file="res/xcms_pattern_1.pdf" compare="sim_size" delta="50000"/>
       <output name="residual_file" file="res/xcms_residual_1.pdf" compare="sim_size" delta="50000"/>
       <output name="result_file" file="res/xcms_result_1.pdf" compare="sim_size" delta="50000"/>
-      <output name="summary_file" file="res/xcms_summary_1.xlsx" compare="sim_size" delta="50000"/>
-      <output name="summary_grp_file" file="res/xcms_summary_grp_1.xlsx" compare="sim_size" delta="50000"/>
+      <output name="summary_file" file="res/xcms_summary_1.tsv" />
+      <output name="summary_grp_file" file="res/xcms_summary_grp_1.tsv" />
       <!-- The following is not from R script, but from cheetah -->  
       <output name="target_out" file="res/xcms_tar_res.tsv" />
     </test>
+
     <test>
       <param name="peak_file" value="xcms.tsv" />
       <param name="targ_file" value="xcms_tar.tsv" />
@@ -374,8 +376,8 @@
       <output name="pattern_file" file="res/xcms_pattern.pdf" compare="sim_size" delta="50000"/>
       <output name="residual_file" file="res/xcms_residual.pdf" compare="sim_size" delta="50000"/>
       <output name="result_file" file="res/xcms_result.pdf" compare="sim_size" delta="50000"/>
-      <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size" delta="50000"/>
-      <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size" delta="50000"/>
+      <output name="summary_file" file="res/xcms_summary.tsv" />
+      <output name="summary_grp_file" file="res/xcms_summary_grp.tsv" />
     </test>
 
     <!-- test the target file and group file -->
@@ -391,8 +393,8 @@
       <output name="pattern_file" file="res/xcms_pattern.pdf" compare="sim_size" delta="50000"/>
       <output name="residual_file" file="res/xcms_residual.pdf" compare="sim_size" delta="50000"/>
       <output name="result_file" file="res/xcms_result.pdf" compare="sim_size" delta="50000"/>
-      <output name="summary_file" file="res/xcms_summary.xlsx" compare="sim_size" delta="50000"/>
-      <output name="summary_grp_file" file="res/xcms_summary_grp.xlsx" compare="sim_size" delta="50000"/>
+      <output name="summary_file" file="res/xcms_summary.tsv" />
+      <output name="summary_grp_file" file="res/xcms_summary_grp.tsv" />
     </test>
 
     <test>
@@ -407,8 +409,8 @@
       <output name="pattern_file" file="res/ecamam12_pattern.pdf" compare="sim_size" delta="50000"/>
       <output name="residual_file" file="res/ecamam12_residual.pdf" compare="sim_size" delta="50000"/>
       <output name="result_file" file="res/ecamam12_result.pdf" compare="sim_size" delta="50000"/>
-      <output name="summary_file" file="res/ecamam12_summary.xlsx" compare="sim_size" delta="50000"/>
-      <output name="summary_grp_file" file="res/ecamam12_summary_grp.xlsx" compare="sim_size" delta="50000"/>
+      <output name="summary_file" file="res/ecamam12_summary.tsv" />
+      <output name="summary_grp_file" file="res/ecamam12_summary_grp.tsv" />
     </test>
     
   </tests>
@@ -548,7 +550,7 @@ Isotopic pattern analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default output is the summary of isotopic pattern analysis for each
-compound. It can be download in ``xlsx`` format to view in Excel. 
+compound.
 
 One example is:  
 
@@ -564,8 +566,8 @@ Standard Error [%]  0.0073567397  0.0073590531  0.007137333     0.0059831704
 Group estimate
 ~~~~~~~~~~~~~~
 
-If user selects to performance group estimating, the result summary can be
-downloaded as an Excel ``XLSX`` file. It looks like for one compound:
+If user selects to performance group estimating, the result summary looks 
+like for one compound:
 
 =====   ==  =============   ============  ============  =============  =============
 Group   N   Mean            SE mean       t_crit        Lower 95% CI   Upper 95% CI

@@ -13,6 +13,7 @@
 #' wl-26-03-2019, Tue: drop R package 'ecipex' and use its scripts directly
 #'  since no 'r-ecipex' in any conda repositories. Also extract function
 #'  'makeup.R', which is called in 'ecipex' from R package 'CHNOSZ'.
+#' wl-26-08-2020, Wed: Review. Fix a bug and remove r package 'WriteXLS'
 
 ## ==== General settings ====
 
@@ -25,17 +26,16 @@ com_f <- T
 options(warn=-1) #' disable R warning. Turn back: options(warn=0)
 
 #' Setup R error handling to go to stderr
-options( show.error.messages=F, error = function (){
-  cat( geterrmessage(), file=stderr() )
-  q( "no", 1, F )
-})
+#' options( show.error.messages=F, error = function (){
+#'   cat( geterrmessage(), file=stderr() )
+#'   q( "no", 1, F )
+#' })
 
 #' we need that to not crash galaxy with an UTF8 error on German LC settings.
 loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(WriteXLS)
   #' library(ecipex)     #' use its R scripts directly
   library(gsubfn)        #' Only for function strapply
 })
@@ -98,20 +98,21 @@ if(com_f){
         make_option("--result_file",type="character", default="result.pdf",
                     help="Save result plot"),
 
-        #' Excel files
-        make_option("--summary_file",type="character",default="summary.xlsx",
-                    help="Save summary results in Excel"),
+        #' Tabular files
+        make_option("--summary_file",type="character",default="summary.tsv",
+                    help="Save summary results in tabular format"),
         make_option("--summary_grp_file",type="character",
-                    default="summary_grp.xlsx",
-                    help="Save group summary results")
+                    default="summary_grp.tsv",
+                    help="Save group summary results in tabulaR format")
     )
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
                     args = commandArgs(trailingOnly = TRUE))
 
 } else {
+  tool_dir <- "~/R_lwc/r_data/cam1/isolab/"
+  #' tool_dir <- "~/my_galaxy/isolab/"
   #' tool_dir <- "C:/R_lwc/isolab/"         #' for windows
-  tool_dir <- "~/my_galaxy/isolab/"  #' for linux. must be case-sensitive
   opt  <- list(
       #' input files and group abundance estimate
       peak_file    = paste0(tool_dir,"test-data/xcms.tsv"),
@@ -120,10 +121,15 @@ if(com_f){
       grp_file_sel = "no",
       #' grp_file     = paste0(tool_dir,"test-data/xcms_grp.tsv"),
       groups       = "C12,C12,C12,C12,C13,C13,C13,C13",
-      #' peak_file = paste0(tool_dir,"test-data/ecamam12.tsv"),
-      #' targ_file = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
-      #' grp_file  = paste0(tool_dir,"test-data/ecamam12_grp.tsv"),
-      #' groups    = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
+      ## peak_file = paste0(tool_dir,"test-data/ecamam12.tsv"),
+      ## targ_file = paste0(tool_dir,"test-data/ecamam12_tar.tsv"),
+      ## grp_file  = paste0(tool_dir,"test-data/ecamam12_grp.tsv"),
+      ## groups    = "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys,
+      ##              12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,
+      ##              12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,
+      ##              13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,
+      ##              13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 
+      ##              13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu",
 
       #' plot output
       pattern_plot  = TRUE,
@@ -136,12 +142,11 @@ if(com_f){
       result_file   = paste0(tool_dir,"test-data/res/result.pdf"),
 
       #' Excel files
-      summary_file     = paste0(tool_dir,"test-data/res/summary.xlsx"),
-      summary_grp_file = paste0(tool_dir,"test-data/res/summary_grp.xlsx")
+      summary_file     = paste0(tool_dir,"test-data/res/summary.tsv"),
+      summary_grp_file = paste0(tool_dir,"test-data/res/summary_grp.tsv")
   )
 }
-
-#' print(opt)
+print(opt)
 
 suppressPackageStartupMessages({
   source(paste0(tool_dir,"pkgs/all_IsotopicLabelling.R"))
@@ -167,34 +172,34 @@ tmp     <- targets[,-ncol(targets)]
 idx     <- complete.cases(tmp)
 targets <- targets[idx,]
 
-#' transpose data frame
-targets  <- as.data.frame(t(targets))
-#' targets  <- as.data.frame(t(targets),stringsAsFactors = F)
-#' targets  <- as.list(targets)
+#' wl-26-08-2020, Wed: do not transpose targets
+#' targets  <- as.data.frame(t(targets))
 
 ## ==== 2) Batch process ====
 
-res_bat <- lapply(targets,function(x){  #'  x = targets[[1]]
+res_bat <- apply(targets, 1, function(x){ #' x = targets[1,]
+  info <-
+    isotopic_information(compound  = as.character(x["compound"]),
+                         charge    = as.numeric(as.character(x["charge"])),
+                         labelling = as.character(x["labelling"]))
 
-  info <- isotopic_information(compound  = as.character(x["compound"]),
-                               charge    = as.numeric(as.character(x["charge"])),
-                               labelling = as.character(x["labelling"]))
+  patterns <-
+    isotopic_pattern(peak_table  = peak,
+                     info        = info,
+                     mass_shift  = as.numeric(as.character(x["mass_shift"])),
+                     RT          = as.numeric(as.character(x["RT"])),
+                     RT_shift    = as.numeric(as.character(x["RT_shift"])),
+                     chrom_width = as.numeric(as.character(x["chrom_width"])))
 
-  patterns <- isotopic_pattern(peak_table  = peak,
-                               info        = info,
-                               mass_shift  = as.numeric(as.character(x["mass_shift"])),
-                               RT          = as.numeric(as.character(x["RT"])),
-                               RT_shift    = as.numeric(as.character(x["RT_shift"])),
-                               chrom_width = as.numeric(as.character(x["chrom_width"])))
-
-  res <- find_abundance(patterns          = patterns,
-                        info              = info,
-                        initial_abundance = as.numeric(as.character(x["initial_abundance"])),
-                        charge            = as.numeric(as.character(x["charge"])))
+  res <-
+    find_abundance(patterns          = patterns,
+                   info              = info,
+                   initial_abundance = as.numeric(as.character(x["initial_abundance"])),
+                   charge            = as.numeric(as.character(x["charge"])))
 
   return(res)
 })
-names(res_bat) <- as.character(unlist(targets[2,]))
+names(res_bat) <- as.character(unlist(targets["compound"]))
 
 ## ==== 3) Process the results ====
 
@@ -218,8 +223,16 @@ if (opt$result_plot) {
 }
 
 #' Summary of individual sample
-summ  <- lapply(res_bat, function(x) as.data.frame(summary(x)))
-WriteXLS(summ, ExcelFileName = opt$summary_file, row.names = T, FreezeRow = 1)
+summ  <- lapply(res_bat, function(x)
+  round(as.data.frame(summary(x)),digits = 3))
+#' wl-26-08-2020, Wed: save in tabular format
+tmp <- lapply(names(summ), function(x){
+  res <- cbind(Compound = x, Stats = row.names(summ[[x]]), summ[[x]])
+})
+tmp <- do.call("rbind", tmp)
+write.table(tmp, file = opt$summary_file, sep = "\t", row.name = FALSE)
+## WriteXLS(summ, ExcelFileName = opt$summary_file, row.names = T,
+##          FreezeRow = 1)
 
 #' Summary of grouped samples
 if (opt$grp) {
@@ -228,8 +241,8 @@ if (opt$grp) {
     groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
                          stringsAsFactors = F)
     groups <- groups[,1,drop = TRUE]
-    #' wl-30-11-2018, Fri: group file must be one column without header. The 
-    #'  file extension can be tsv, csv or txt. sep="\t" takes no effect on one 
+    #' wl-30-11-2018, Fri: group file must be one column without header. The
+    #'  file extension can be tsv, csv or txt. sep="\t" takes no effect on one
     #'  column file.
   } else {
     groups <- opt$groups
@@ -238,92 +251,15 @@ if (opt$grp) {
   }
   groups <- as.factor(tolower(groups))
 
-  summ_grp <- lapply(res_bat, function(x) group_labelling(x, groups = groups))
-  WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T, FreezeRow = 1)
+  summ_grp <- lapply(res_bat, function(x)
+    round(group_labelling(x, groups = groups), digits = 3))
+  #' wl-26-08-2020, Wed: save in tabular format
+  tmp <- lapply(names(summ_grp), function(x){
+    res <- cbind(Compound = x, Group = row.names(summ_grp[[x]]), summ_grp[[x]])
+  })
+  tmp <- do.call("rbind", tmp)
+  write.table(tmp, file = opt$summary_grp_file, sep = "\t", row.name = FALSE)
+  ## WriteXLS(summ_grp, ExcelFileName = opt$summary_grp_file, row.names = T,
+  ##          FreezeRow = 1)
 }
 
-## ==== DEBUG: Step-by-step codes ====
-
-#' wl-13-04-2018, Fri: test our own data set
-
-if (F) {
-  info <- isotopic_information(compound="X51H98O6", labelling="C")
-  #' names(info)
-  #' info$isotopes
-
-  patterns <- isotopic_pattern(peak, info, mass_shift=0.05,
-                               RT=385, RT_shift=10, chrom_width=9)
-  #' View(patterns)
-
-  fitted <- find_abundance(patterns=patterns, info=info,
-                           initial_abundance=NA, charge=1)
-  #' names(fitted)
-  #' summary(fitted)
-  #' save_labelling(fitted)
-
-  #' Or use wrapper function
-  fitted <- main_labelling(peak, compound="X51H98O6",
-                           charge=1, labelling="C", mass_shift=0.05,
-                           RT=380, RT_shift=10, chrom_width=7,
-                           initial_abundance=NA)
-
-  plot(x=fitted, type="patterns", saveplots=F)
-  plot(x=fitted, type="residuals", saveplots=F)
-  plot(x=fitted, type="summary", saveplots=F)
-
-  #' Group the samples and obtain grouped estimates
-  #' groups <- factor(c(rep("C12",4), rep("C13",4))) 
-  groups  <- "12C_Lys,12C_Lys,12C_Lys,12C_Glu,12C_Glu,12C_Glu,12C_Lys, 
-              12C_Lys,12C_Lys,13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu, 
-              12C_Glu,13C_Glu,13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys, 
-              13C_Lys,13C_Lys,13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu, 
-              13C_Glu,13C_Glu,12C_Lys,12C_Lys,12C_Lys,13C_Lys,13C_Lys, 
-              13C_Lys,12C_Glu,12C_Glu,12C_Glu,13C_Glu,13C_Glu,13C_Glu"
-  groups  <- unlist(strsplit(groups,","))
-  groups  <- gsub("^[ \t]+|[ \t]+$", "", groups)  #' trim white spaces
-  groups  <- factor(groups)
-
-  grp_est <- group_labelling(fitted,groups=groups)
-  grp_est
-}
-
-## ==== DEBUG: Original batch process ====
-
-if (F) {
-  #' Batch-process
-  #' wl-13-04-2018, Fri: Not work. Here 'targets' should not be transposed.
-  #' wl-30-05-2018, Wed: Should change the original R codes
-
-  bat_grp_est <- batch_labelling(peak_table=peak, targets=targets,
-                                 groups=groups,
-                                 plot_patterns=F, plot_residuals=F,
-                                 plot_results=F, save_results=F)
-  bat_grp_est
-
-  #' Use data set from xcms
-  load("./test-data/xcms_obj.rda") #' data("xcms_obj")
-  peak <- table_xcms(xcms_obj)
-  write.table(peak, file="./test-data/xcms_obj.tsv", sep = "\t",
-              row.names = FALSE, quote = FALSE)
-
-  #' Get the example data frame containing target abalytes
-  load("./test-data/targets.rda") #' data("targets")
-  write.table(targets,file="./test-data/targets.tsv", sep="\t",
-              row.names = FALSE, quote = FALSE)
-
-  para  <- c("compound", "charge", "labelling", "RT", "RT_shift",
-             "chrom_width", "mass_shift", "initial_abundance")
-  targets <- targets[,para]
-
-  res <- main_labelling(peak_table        = peak,
-                        compound          = as.character(x["compound"]),
-                        charge            = as.numeric(as.character(x["charge"])),
-                        labelling         = as.character(x["labelling"]),
-                        mass_shift        = as.numeric(as.character(x["mass_shift"])),
-                        RT                = as.numeric(as.character(x["RT"])),
-                        RT_shift          = as.numeric(as.character(x["RT_shift"])),
-                        chrom_width       = as.numeric(as.character(x["chrom_width"])),
-                        initial_abundance = as.numeric(as.character(x["initial_abundance"])))
-
-  summ     <- lapply(res_bat,"[[","summary")
-}
